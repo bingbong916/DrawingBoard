@@ -14,6 +14,7 @@ public class CMClientApp {
     public CMClientApp() {
         m_clientStub = new CMClientStub();
         m_eventHandler = new CMClientEventHandler(m_clientStub);
+        m_clientStub.setAppEventHandler(m_eventHandler);  // Make sure this is correctly set
     }
 
     public CMClientStub getClientStub() {

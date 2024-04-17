@@ -1,5 +1,7 @@
 package client.frames;
 
+import server.CMClientApp;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,7 +27,7 @@ public class MainFrame extends JFrame {
   private int count = 1;
 
   @SuppressWarnings("static-access")
-  public MainFrame() {
+  public MainFrame(CMClientApp cmClientApp) {
     // attribute
     this.setSize(590, 600);
     this.setTitle("GraphicsEditor");
@@ -43,7 +45,8 @@ public class MainFrame extends JFrame {
     // components
 
     this.drawingPanel = new DrawingPanel();
-    this.drawingPanelList.add(drawingPanel);
+    this.drawingPanel.setCMClientApp(cmClientApp);
+
     this.add(drawingPanel, borderlayout.CENTER);
 
     this.toolBar = new ToolBar();
