@@ -69,6 +69,7 @@ public class CMClientEventHandler implements CMAppEventHandler {
             System.out.println(" - GTriangle 도착 ●◎");
         } else {
             System.out.println("◎● Log: GShape 객체가 아닌 것이 도착함.\n" + result);
+            return;
         }
         for (JPanel jPanel : drawingPanelList) {
             DrawingPanel drawingPanel = (DrawingPanel) jPanel;
