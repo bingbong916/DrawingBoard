@@ -24,24 +24,43 @@ public class CMClientApp {
         return m_eventHandler;
     }
 
-    public static void main(String[] args) {
-        CMClientApp client = new CMClientApp();
-        CMClientStub cmStub = client.getClientStub();
-        CMClientEventHandler eventHandler = client.getClientEventHandler();
-        boolean ret = false;
+    // ------------------------------------------------------------
 
+    private CMClientApp cmClientApp;
+    private CMClientStub cmClientStub;
+    private CMClientEventHandler cmClientEventHandler;
+    public CMClientApp getCmClientApp() {
+        return cmClientApp;
+    }
+
+    public CMClientStub getCmClientStub() {
+        return cmClientStub;
+    }
+
+    public CMClientEventHandler getCmClientEventHandler() {
+        return cmClientEventHandler;
+    }
+
+    public boolean init() {
+        cmClientApp = new CMClientApp();
+        cmClientStub = cmClientApp.getClientStub();
+        cmClientEventHandler = cmClientApp.getClientEventHandler();
+
+        boolean ret = false;
         // initialize CM
-        cmStub.setAppEventHandler(eventHandler);
-        ret = cmStub.startCM();
+        cmClientStub.setAppEventHandler(cmClientEventHandler);
+        ret = cmClientStub.startCM();
 
         if (ret) {
             System.out.println("init success");
+            return true;
         } else {
             System.out.println("init error!");
-            return;
+            return false;
         }
+    }
 
-        loginProcess(client);
+    public void startChat() {
         // Chatting
         BufferedReader br;
         String strMessage = null;
@@ -55,11 +74,11 @@ public class CMClientApp {
             if (strMessage.equals("exit")) {
                 break;
             }
-            cmStub.chat("/b", strMessage);
+            cmClientStub.chat("/b", strMessage);
         }
     }
 
-    private static void loginProcess(CMClientApp client) {
+    public boolean loginProcess(CMClientApp client) {
         String strUserName = null;
         String strPassword = null;
         boolean bRequestResult = false;
@@ -78,11 +97,15 @@ public class CMClientApp {
 
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
         bRequestResult = client.getClientStub().loginCM(strUserName, strPassword);
         if(bRequestResult)
             System.out.println("successfully sent the login request.");
-        else
+        else {
             System.err.println("failed the login request!");
+            return false;
+        }
+        return true;
     }
 }
