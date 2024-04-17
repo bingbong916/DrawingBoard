@@ -24,6 +24,14 @@ public class MainFrame extends JFrame {
   private final Vector<JPanel> drawingPanelList;
   private int count = 1;
 
+  // sungwoon 작성
+
+  public Vector<JPanel> getDrawingPanelList() {
+    return drawingPanelList;
+  }
+
+  // sungwoon 작성 여기까지
+
   @SuppressWarnings("static-access")
   public MainFrame() {
     // attribute

@@ -1,5 +1,6 @@
 package server;
 
+import client.shapes.GShape;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 
 import java.io.BufferedReader;
