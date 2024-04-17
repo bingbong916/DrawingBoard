@@ -6,6 +6,10 @@ import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 import server.CMClientApp;
 import server.CMClientEventHandler;
 
+import javax.swing.*;
+
+import java.util.Vector;
+
 import static java.lang.System.exit;
 
 public class Main {
@@ -30,5 +34,9 @@ public class Main {
 		mainframe.setVisible(true);
 		mainframe.setResizable(true);
 		mainframe.setLocationRelativeTo(null);
+
+		// init drawingPanelList
+		Vector<JPanel> drawingPanelList = mainframe.getDrawingPanelList();
+		cmClientApp.getCmClientEventHandler().setDrawingPanelList(drawingPanelList);
 	}
 }

@@ -380,6 +380,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
         this.cmClientStub.broadcast(due);
       }
     }
+    System.out.println(shapes);
     this.repaint();
   }
 
