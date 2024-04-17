@@ -345,10 +345,14 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
         this.isUpdated = this.shapes.size() > 0;
       } else {
         this.shapes.add(this.selectedShape);
+
+
+
         this.clip.tempshapes.clear();
         this.isUpdated = true;
       }
     }
+    System.out.println(shapes);
     this.repaint();
   }
 
