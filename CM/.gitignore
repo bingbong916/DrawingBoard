@@ -16,4 +16,6 @@ bin/
 .idea/
 *.iml
 *.iws
+client-file-path/throughput-test.jpg
+server-file-path/throughput-test.jpg
 
