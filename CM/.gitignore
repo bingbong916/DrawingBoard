@@ -14,6 +14,7 @@ bin/
 ../.DS_Store
 # Intellij
 .idea/
+../.idea
 *.iml
 *.iws
 client-file-path/throughput-test.jpg
