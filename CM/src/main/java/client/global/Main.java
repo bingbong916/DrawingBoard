@@ -1,5 +1,7 @@
 package client.global;
 import client.frames.MainFrame;
+import kr.ac.konkuk.ccslab.cm.entity.CMUser;
+import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 import server.CMClientApp;
 import server.CMClientEventHandler;
@@ -11,11 +13,12 @@ import java.util.Vector;
 import static java.lang.System.exit;
 
 public class Main {
+	public static CMClientApp cmClientApp = new CMClientApp();
+
 	public static void main(String[] args) {
-		CMClientApp cmClientApp = new CMClientApp();
 		boolean isInit = cmClientApp.init();
 		if (isInit) {
-			if (cmClientApp.loginProcess(cmClientApp.getCmClientApp())) {
+			if (cmClientApp.loginProcess(cmClientApp)) {
 				startPaint(cmClientApp);
 				cmClientApp.startChat();
 			} else {
@@ -27,7 +30,7 @@ public class Main {
 	}
 
 	private static void startPaint(CMClientApp cmClientApp) {
-		MainFrame mainframe = new MainFrame();
+		MainFrame mainframe = new MainFrame(cmClientApp);
 		mainframe.setVisible(true);
 		mainframe.setResizable(true);
 		mainframe.setLocationRelativeTo(null);
