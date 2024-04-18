@@ -1,5 +1,7 @@
 package client.frames;
 
+import server.CMClientApp;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,6 +32,10 @@ public class MainFrame extends JFrame {
     return drawingPanelList;
   }
 
+  public DrawingPanel getDrawingPanel() {
+    return this.drawingPanel;
+  }
+
   // sungwoon 작성 여기까지
 
   @SuppressWarnings("static-access")
@@ -51,7 +57,7 @@ public class MainFrame extends JFrame {
     // components
 
     this.drawingPanel = new DrawingPanel();
-    this.drawingPanelList.add(drawingPanel);
+
     this.add(drawingPanel, borderlayout.CENTER);
 
     this.toolBar = new ToolBar();

@@ -18,9 +18,16 @@ import java.awt.image.ColorModel;
 import java.awt.image.MemoryImageSource;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import client.global.Main;
 import client.menus.PopupMenu;
 import client.shapes.GAnchor;
 import client.shapes.GAnchor.EAnchors;
@@ -36,6 +43,11 @@ import client.transformer.GMover;
 import client.transformer.GResizer;
 import client.transformer.GRotator;
 import client.transformer.GTransformer;
+import kr.ac.konkuk.ccslab.cm.entity.CMUser;
+import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
+import kr.ac.konkuk.ccslab.cm.info.CMInteractionInfo;
+import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
+import server.CMClientApp;
 
 public class DrawingPanel extends JPanel implements java.awt.print.Printable {
 
@@ -124,7 +136,10 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     this.pixelimage = null;
     previewPanel.setFillColor(Color.WHITE);
     previewPanel.setLineColor(Color.BLACK);
-
+    if (Main.cmClientApp.getCmClientStub() == null) {
+      System.err.println("CMClientStub is not initialized!");
+      return;
+    }
     this.setBackgroundColor(backgroundColor);
     this.repaint();
   }
@@ -346,13 +361,21 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
       } else {
         this.shapes.add(this.selectedShape);
 
+        String shapeDetails = serializeShape(this.selectedShape);
 
+        CMInteractionInfo interInfo = Main.cmClientApp.getCmClientStub().getCMInfo().getInteractionInfo();
+        CMUser myself = interInfo.getMyself();
+
+        CMDummyEvent due = new CMDummyEvent();
+        due.setHandlerSession(myself.getCurrentSession());
+        due.setHandlerGroup(myself.getCurrentGroup());
+        due.setDummyInfo(shapeDetails);
 
         this.clip.tempshapes.clear();
         this.isUpdated = true;
+        Main.cmClientApp.getCmClientStub().broadcast(due);
       }
     }
-    System.out.println(shapes);
     this.repaint();
   }
 
@@ -662,5 +685,17 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
 
     return (NO_SUCH_PAGE);
   }
-
+  
+  private String serializeShape(GShape shape) {
+    try {
+      ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
+      ObjectOutputStream out = new ObjectOutputStream(byteArrayOut);
+      out.writeObject(shape);
+      out.close();
+      return Base64.getEncoder().encodeToString(byteArrayOut.toByteArray());
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
 }
