@@ -16,6 +16,7 @@ public class ToolBar extends JToolBar {
 
 	private ActionListener actionListener;
 	private DrawingPanel drawingPanel;
+
 	//private PreviewPanel previewPanel;
 	
 

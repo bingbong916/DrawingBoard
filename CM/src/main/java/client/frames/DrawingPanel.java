@@ -53,7 +53,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
 
   private boolean isUpdated;
 
-  private PreviewPanel previewPanel;
+  //private PreviewPanel previewPanel;
 
   private Color lineColor;
   private Color fillColor;
@@ -135,8 +135,8 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     this.selectedShape = null;
     this.openimage = null;
     this.pixelimage = null;
-    previewPanel.setFillColor(Color.WHITE);
-    previewPanel.setLineColor(Color.BLACK);
+//    previewPanel.setFillColor(Color.WHITE);
+//    previewPanel.setLineColor(Color.BLACK);
     if (this.cmClientStub == null) {
       System.err.println("CMClientStub is not initialized!");
       return;
@@ -150,11 +150,11 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
   }
   // get/set methods
 
-  public void associatePreviewPanel(PreviewPanel previewPanel) {
-    this.previewPanel = previewPanel;
-    this.previewPanel.setFillColor(fillColor);
-    this.previewPanel.setLineColor(lineColor);
-  }
+//  public void associatePreviewPanel(PreviewPanel previewPanel) {
+//    this.previewPanel = previewPanel;
+//    this.previewPanel.setFillColor(fillColor);
+//    this.previewPanel.setLineColor(lineColor);
+//  }
 
   public boolean isUpdated() {
     return isUpdated;
@@ -242,12 +242,12 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
 
   public void setLineColor(Color linecolor) {
     this.lineColor = linecolor;
-    previewPanel.setLineColor(linecolor);
+    //previewPanel.setLineColor(linecolor);
   }
 
   public void setFillColor(Color fillcolor) {
     this.fillColor = fillcolor;
-    previewPanel.setFillColor(fillcolor);
+    //previewPanel.setFillColor(fillcolor);
   }
 
   public void setBackgroundColor(Color backgroundcolor) {
@@ -282,15 +282,15 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     this.repaint();
   }
 
-  public void zoomIn() {
-    this.scale = this.scale+0.5;
-    repaint();
-  }
-
-  public void zoomOut() {
-    this.scale = this.scale-0.5;
-    repaint();
-  }
+//  public void zoomIn() {
+//    this.scale = this.scale+0.5;
+//    repaint();
+//  }
+//
+//  public void zoomOut() {
+//    this.scale = this.scale-0.5;
+//    repaint();
+//  }
 
   // Paint Components
   public void paint(Graphics g) {

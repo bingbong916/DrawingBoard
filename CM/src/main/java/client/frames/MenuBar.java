@@ -5,7 +5,7 @@ import client.menus.ColorMenu;
 import client.menus.EditMenu;
 import client.menus.FileMenu;
 import client.menus.StrokeMenu;
-import client.menus.ZoomMenu;
+//import client.menus.ZoomMenu;
 
 @SuppressWarnings("serial")
 public class MenuBar extends JMenuBar {
