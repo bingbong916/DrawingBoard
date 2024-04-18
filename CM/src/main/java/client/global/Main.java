@@ -6,6 +6,7 @@ import static java.lang.System.exit;
 
 public class Main {
 	public static CMClientApp cmClientApp = new CMClientApp();
+	public static MainFrame mainFrame = new MainFrame();
 
 	public static void main(String[] args) {
 		boolean isInit = cmClientApp.init();
@@ -22,12 +23,11 @@ public class Main {
 	}
 
 	private static void startPaint(CMClientApp cmClientApp) {
-		MainFrame mainframe = new MainFrame();
-		mainframe.setVisible(true);
-		mainframe.setResizable(true);
-		mainframe.setLocationRelativeTo(null);
+		mainFrame.setVisible(true);
+		mainFrame.setResizable(true);
+		mainFrame.setLocationRelativeTo(null);
 
 		// set mainFrame in ClientEventHandler
-		cmClientApp.getCmClientEventHandler().setMainFrame(mainframe);
+		cmClientApp.getCmClientEventHandler().setMainFrame(mainFrame);
 	}
 }

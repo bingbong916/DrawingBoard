@@ -48,6 +48,7 @@ import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
 import kr.ac.konkuk.ccslab.cm.info.CMInteractionInfo;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 import server.CMClientApp;
+import server.Tools;
 
 public class DrawingPanel extends JPanel implements java.awt.print.Printable {
 
@@ -361,7 +362,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
       } else {
         this.shapes.add(this.selectedShape);
 
-        String shapeDetails = serializeShape(this.selectedShape);
+        String shapeDetails = Tools.serializeShape(this.selectedShape);
 
         CMInteractionInfo interInfo = Main.cmClientApp.getCmClientStub().getCMInfo().getInteractionInfo();
         CMUser myself = interInfo.getMyself();
@@ -684,18 +685,5 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     }
 
     return (NO_SUCH_PAGE);
-  }
-  
-  private String serializeShape(GShape shape) {
-    try {
-      ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
-      ObjectOutputStream out = new ObjectOutputStream(byteArrayOut);
-      out.writeObject(shape);
-      out.close();
-      return Base64.getEncoder().encodeToString(byteArrayOut.toByteArray());
-    } catch (IOException e) {
-      e.printStackTrace();
-      return null;
-    }
   }
 }
