@@ -1,6 +1,6 @@
 package client.frames;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -26,11 +26,12 @@ public class ToolBar extends JToolBar {
 		
 		for (EShapes eButton : EShapes.values()) {
 			JRadioButton button = new JRadioButton();
+			button.setPreferredSize(new Dimension(60,60));
 			button.setBackground(Color.white); // toString() = name()
 			button.setIcon(new ImageIcon(eButton.getImage()));
 			button.setSelectedIcon(new ImageIcon(eButton.getSelectedImage()));
 			button.setActionCommand(eButton.toString()); // toString is bring enum names. ex)eOval,eLine...
-			button.setToolTipText(eButton.getTooltipname());
+			button.setToolTipText(eButton.getTooltipName());
 			button.addActionListener(actionListener);
 			this.add(button);
 			buttonGroup.add(button);
