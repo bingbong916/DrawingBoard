@@ -31,7 +31,7 @@ public class CMServerEventHandler implements CMAppEventHandler {
 
     private void processDummyEvent(CMEvent cmEvent) {
         CMDummyEvent due = (CMDummyEvent) cmEvent;
-        CMServerApp.shapes.add(due.getDummyInfo());
+        CMServerApp.shapeStringList.add(due.getDummyInfo());
         System.out.println("dummy msg: " + due.getDummyInfo());
     }
 
@@ -41,23 +41,27 @@ public class CMServerEventHandler implements CMAppEventHandler {
             case CMSessionEvent.LOGIN -> {
                 System.out.println("[" + se.getUserName() + "] requests login.");
 
-                // 로그인 한 유저에게 저장된 도형 목록 전송
-                CMInteractionInfo interInfo = m_serverStub.getCMInfo().getInteractionInfo();
-                CMUser myself = interInfo.getMyself();
-                CMDummyEvent due = new CMDummyEvent();
-                due.setHandlerSession(myself.getCurrentSession());
-                due.setHandlerGroup(myself.getCurrentGroup());
-                // 도형이 있는 경우
-                if (!CMServerApp.shapes.isEmpty()) {
-                    Gson gson = new Gson();
-                    String jsonString = gson.toJson(CMServerApp.shapes);
-                    due.setDummyInfo(jsonString);
-                    CMServerApp.m_serverStub.send(due, se.getUserName());
-                } else { // 도형이 없는 경우
-                    due.setDummyInfo("");
-                    CMServerApp.m_serverStub.send(due, se.getUserName());
-                }
+                sendShapesList(se.getUserName());
             }
+        }
+    }
+
+    public void sendShapesList(String receiver) {
+        // 로그인 한 유저에게 저장된 도형 목록 전송
+        CMInteractionInfo interInfo = m_serverStub.getCMInfo().getInteractionInfo();
+        CMUser myself = interInfo.getMyself();
+        CMDummyEvent due = new CMDummyEvent();
+        due.setHandlerSession(myself.getCurrentSession());
+        due.setHandlerGroup(myself.getCurrentGroup());
+        // 도형이 있는 경우
+        if (!CMServerApp.shapeStringList.isEmpty()) {
+            Gson gson = new Gson();
+            String jsonString = gson.toJson(CMServerApp.shapeStringList);
+            due.setDummyInfo(jsonString);
+            CMServerApp.m_serverStub.send(due, receiver);
+        } else { // 도형이 없는 경우
+            due.setDummyInfo("");
+            CMServerApp.m_serverStub.send(due, receiver);
         }
     }
 }
