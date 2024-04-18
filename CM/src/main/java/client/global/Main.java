@@ -1,14 +1,6 @@
 package client.global;
 import client.frames.MainFrame;
-import kr.ac.konkuk.ccslab.cm.entity.CMUser;
-import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
-import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 import server.CMClientApp;
-import server.CMClientEventHandler;
-
-import javax.swing.*;
-
-import java.util.Vector;
 
 import static java.lang.System.exit;
 
@@ -25,18 +17,17 @@ public class Main {
 				exit(1);
 			}
 		} else {
-			exit(1);
+			exit(2);
 		}
 	}
 
 	private static void startPaint(CMClientApp cmClientApp) {
-		MainFrame mainframe = new MainFrame(cmClientApp);
+		MainFrame mainframe = new MainFrame();
 		mainframe.setVisible(true);
 		mainframe.setResizable(true);
 		mainframe.setLocationRelativeTo(null);
 
-		// init drawingPanelList
-		Vector<JPanel> drawingPanelList = mainframe.getDrawingPanelList();
-		cmClientApp.getCmClientEventHandler().setDrawingPanelList(drawingPanelList);
+		// set mainFrame in ClientEventHandler
+		cmClientApp.getCmClientEventHandler().setMainFrame(mainframe);
 	}
 }

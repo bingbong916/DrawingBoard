@@ -1,6 +1,5 @@
 package server;
 
-import client.shapes.GShape;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 
 import java.io.BufferedReader;
@@ -9,25 +8,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class CMClientApp {
-    private CMClientStub m_clientStub;
-    private CMClientEventHandler m_eventHandler;
-
-    public CMClientApp() {
-        m_clientStub = new CMClientStub();
-        m_eventHandler = new CMClientEventHandler(m_clientStub);
-        m_clientStub.setAppEventHandler(m_eventHandler);  // Make sure this is correctly set
-    }
-
-    public CMClientStub getClientStub() {
-        return m_clientStub;
-    }
-
-    public CMClientEventHandler getClientEventHandler() {
-        return m_eventHandler;
-    }
-
-    // ------------------------------------------------------------
-
     private CMClientApp cmClientApp;
     private CMClientStub cmClientStub;
     private CMClientEventHandler cmClientEventHandler;
@@ -45,8 +25,8 @@ public class CMClientApp {
 
     public boolean init() {
         cmClientApp = new CMClientApp();
-        cmClientStub = cmClientApp.getClientStub();
-        cmClientEventHandler = cmClientApp.getClientEventHandler();
+        cmClientStub = new CMClientStub();
+        cmClientEventHandler = new CMClientEventHandler(cmClientStub);
 
         boolean ret = false;
         // initialize CM
@@ -101,7 +81,7 @@ public class CMClientApp {
             e.printStackTrace();
             return false;
         }
-        bRequestResult = client.getClientStub().loginCM(strUserName, strPassword);
+        bRequestResult = client.getCmClientStub().loginCM(strUserName, strPassword);
         if(bRequestResult)
             System.out.println("successfully sent the login request.");
         else {

@@ -32,10 +32,14 @@ public class MainFrame extends JFrame {
     return drawingPanelList;
   }
 
+  public DrawingPanel getDrawingPanel() {
+    return this.drawingPanel;
+  }
+
   // sungwoon 작성 여기까지
 
   @SuppressWarnings("static-access")
-  public MainFrame(CMClientApp cmClientApp) {
+  public MainFrame() {
     // attribute
     this.setSize(590, 600);
     this.setTitle("GraphicsEditor");
@@ -53,7 +57,6 @@ public class MainFrame extends JFrame {
     // components
 
     this.drawingPanel = new DrawingPanel();
-    this.drawingPanel.setCMClientApp(cmClientApp);
 
     this.add(drawingPanel, borderlayout.CENTER);
 

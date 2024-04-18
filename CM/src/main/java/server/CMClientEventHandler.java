@@ -1,6 +1,8 @@
 package server;
 
 import client.frames.DrawingPanel;
+import client.frames.MainFrame;
+import client.global.Main;
 import client.shapes.*;
 import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMEvent;
@@ -13,19 +15,18 @@ import javax.swing.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Vector;
 
 public class CMClientEventHandler implements CMAppEventHandler {
     private CMClientStub m_ClientStub;
 
-    private Vector<JPanel> drawingPanelList;
+    private MainFrame mainFrame;
 
-    public void setDrawingPanelList(Vector<JPanel> drawingPanelList) {
-        this.drawingPanelList = drawingPanelList;
+    public void setMainFrame(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
     }
+
 
     public CMClientEventHandler(CMClientStub clientStub) {
         this.m_ClientStub = clientStub;
@@ -45,6 +46,12 @@ public class CMClientEventHandler implements CMAppEventHandler {
 
     private void processDummyEvent(CMEvent cmEvent) {
         CMDummyEvent due = (CMDummyEvent) cmEvent;
+        String user = due.getSender();
+        if (user.equals(m_ClientStub.getMyself().getName())) {
+            System.out.println("◎● Log: 내 메시지라 추가 안됨.");
+            return;
+        }
+
         GShape result = deserializeString(due.getDummyInfo());
         if (result instanceof GLine) {
             System.out.println("◎● Log: " + due.getDummyInfo());
@@ -71,11 +78,10 @@ public class CMClientEventHandler implements CMAppEventHandler {
             System.out.println("◎● Log: GShape 객체가 아닌 것이 도착함.\n" + result);
             return;
         }
-        for (JPanel jPanel : drawingPanelList) {
-            DrawingPanel drawingPanel = (DrawingPanel) jPanel;
-            Vector<GShape> gShapes = (Vector<GShape>) drawingPanel.getShapes();
-            gShapes.add(result);
-        }
+        DrawingPanel drawingPanel = mainFrame.getDrawingPanel();
+        Vector<GShape> gShapes = (Vector<GShape>) drawingPanel.getShapes();
+        gShapes.add(result);
+        System.out.println(gShapes);
     }
     private GShape deserializeString(String encodedShape) {
         try {

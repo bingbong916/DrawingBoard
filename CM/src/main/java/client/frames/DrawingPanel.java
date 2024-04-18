@@ -76,7 +76,6 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
   private EDrawingState eDrawingState;
   private ECurrentState eCurrentState;
   private EAnchors eAnchor;
-  private CMClientStub cmClientStub;
 
   private enum EDrawingState {
     eIdle, // no draw state
@@ -137,7 +136,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     this.pixelimage = null;
     previewPanel.setFillColor(Color.WHITE);
     previewPanel.setLineColor(Color.BLACK);
-    if (this.cmClientStub == null) {
+    if (Main.cmClientApp.getCmClientStub() == null) {
       System.err.println("CMClientStub is not initialized!");
       return;
     }
@@ -145,9 +144,6 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     this.repaint();
   }
 
-  public void setCMClientApp(CMClientApp cmClientApp) {
-    this.cmClientStub = cmClientApp.getClientStub();
-  }
   // get/set methods
 
   public void associatePreviewPanel(PreviewPanel previewPanel) {
@@ -377,10 +373,9 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
 
         this.clip.tempshapes.clear();
         this.isUpdated = true;
-        this.cmClientStub.broadcast(due);
+        Main.cmClientApp.getCmClientStub().broadcast(due);
       }
     }
-    System.out.println(shapes);
     this.repaint();
   }
 
