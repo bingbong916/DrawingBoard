@@ -362,19 +362,10 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
       } else {
         this.shapes.add(this.selectedShape);
 
-        String shapeDetails = Tools.serializeShape(this.selectedShape);
-
-        CMInteractionInfo interInfo = Main.cmClientApp.getCmClientStub().getCMInfo().getInteractionInfo();
-        CMUser myself = interInfo.getMyself();
-
-        CMDummyEvent due = new CMDummyEvent();
-        due.setHandlerSession(myself.getCurrentSession());
-        due.setHandlerGroup(myself.getCurrentGroup());
-        due.setDummyInfo(shapeDetails);
-
         this.clip.tempshapes.clear();
         this.isUpdated = true;
-        Main.cmClientApp.getCmClientStub().broadcast(due);
+
+        Main.broadcastShape(this.selectedShape);
       }
     }
     this.repaint();

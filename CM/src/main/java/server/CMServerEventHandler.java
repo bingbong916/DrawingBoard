@@ -41,7 +41,7 @@ public class CMServerEventHandler implements CMAppEventHandler {
             case CMSessionEvent.LOGIN -> {
                 System.out.println("[" + se.getUserName() + "] requests login.");
 
-                sendShapesList(se.getUserName());
+                //sendShapesList(se.getUserName());
             }
         }
     }
