@@ -39,7 +39,8 @@ public class ToolBar extends JToolBar {
 		this.add(colorPanel);
 
 		JButton colorBtn = new JButton();
-		colorBtn.setIcon(new ImageIcon("images/imagerect.png"));
+		colorBtn.setIcon(new ImageIcon("images/colorwheel.png"));
+		colorBtn.addActionListener(new ColorBtnHandler());
 		this.add(colorBtn);
 
 //		this.previewPanel = new PreviewPanel();
@@ -60,6 +61,14 @@ public class ToolBar extends JToolBar {
 			EShapes eShapeTool = EShapes.valueOf(event.getActionCommand());
 			drawingPanel.seteCurrentState(eShapeTool.getCurrentState());
 			drawingPanel.setSelection(eShapeTool.newInstance());
+		}
+	}
+
+	private class ColorBtnHandler implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			Color selectedColor = JColorChooser.showDialog(null, "Color", Color.yellow);
+			drawingPanel.setLineColor(selectedColor);
+			drawingPanel.setSelectedLineColor();
 		}
 	}
 
