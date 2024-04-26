@@ -49,16 +49,16 @@ public class ToolBar extends JToolBar {
 		this.add(colorBtn);
 		this.add(colorBucketBtn);
 
-//		this.previewPanel = new PreviewPanel();
-//		this.addSeparator();
-//		this.add(previewPanel);
+		this.previewPanel = new PreviewPanel();
+		this.addSeparator();
+		this.add(previewPanel);
 	}
 
 	public void associate(DrawingPanel drawingPanel) {
 		this.drawingPanel = drawingPanel;
 		JRadioButton defaultBtn = ((JRadioButton) this.getComponent(EShapes.eSelection.ordinal()));
 		defaultBtn.doClick();
-		//drawingPanel.associatePreviewPanel(previewPanel);
+		drawingPanel.associatePreviewPanel(previewPanel);
 	}
 
 
