@@ -41,7 +41,13 @@ public class ToolBar extends JToolBar {
 		JButton colorBtn = new JButton();
 		colorBtn.setIcon(new ImageIcon("images/colorwheel.png"));
 		colorBtn.addActionListener(new ColorBtnHandler());
+
+		JButton colorBucketBtn = new JButton();
+		colorBucketBtn.setIcon(new ImageIcon("images/colorbucket.png"));
+		colorBucketBtn.addActionListener(new ColorBucketBtnHandler());
+
 		this.add(colorBtn);
+		this.add(colorBucketBtn);
 
 //		this.previewPanel = new PreviewPanel();
 //		this.addSeparator();
@@ -69,6 +75,14 @@ public class ToolBar extends JToolBar {
 			Color selectedColor = JColorChooser.showDialog(null, "Color", Color.yellow);
 			drawingPanel.setLineColor(selectedColor);
 			drawingPanel.setSelectedLineColor();
+		}
+	}
+
+	private class ColorBucketBtnHandler implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			Color selectedColor = JColorChooser.showDialog(null, "Color", Color.yellow);
+			drawingPanel.setFillColor(selectedColor);
+			drawingPanel.setSelectedFillColor();
 		}
 	}
 

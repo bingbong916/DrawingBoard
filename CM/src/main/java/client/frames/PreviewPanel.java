@@ -20,7 +20,7 @@ public class PreviewPanel extends JPanel {
 		this.setBackground(Color.WHITE);
 		setLayout(new FlowLayout(FlowLayout.CENTER, 1, 1));
 
-		JLabel previewlabel = new JLabel("Preview");
+		JLabel previewlabel = new JLabel("색상 미리보기");
 		this.add(previewlabel);
 	}
 
