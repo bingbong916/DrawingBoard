@@ -174,9 +174,44 @@ public class CMClientEventHandler implements CMAppEventHandler {
     private void processSessionEvent(CMEvent cmEvent) {
         CMSessionEvent se = (CMSessionEvent) cmEvent;
         switch (se.getID()) {
-            case CMSessionEvent.SESSION_TALK -> {
-                System.out.println("[" + se.getUserName() + "] : " + se.getTalk());
-            }
+            case CMSessionEvent.JOIN_SESSION_ACK:
+                handleJoinSessionAck(se);
+                break;
+            case CMSessionEvent.CHANGE_SESSION:
+                handleChangeSession(se);
+                break;
+            case CMSessionEvent.SESSION_ADD_USER:
+                handleSessionAddUser(se);
+                break;
+            case CMSessionEvent.SESSION_REMOVE_USER:
+                handleSessionRemoveUser(se);
+                break;
+            default:
+                System.out.println("지원하지 않는 session event ID: " + se.getID());
+                break;
         }
     }
+    private void handleSessionAddUser(CMSessionEvent se) {
+        String userName = se.getUserName();
+        // 유저의 IP address 필요시 사용
+//        String userHost = se.getHostAddress();
+        String message = userName + " has joined the board.";
+        mainFrame.updateLog(message);
+    }
+
+    private void handleSessionRemoveUser(CMSessionEvent se) {
+        String userName = se.getUserName();
+        String message = userName + " left the board.";
+        mainFrame.updateLog(message);
+    }
+
+    // TODO: 필요시 추가 구현
+    private void handleJoinSessionAck(CMSessionEvent se) {
+        System.out.println("Session Join Acknowledged: " + se.getSessionName() + ", Groups: " + se.getGroupNum());
+    }
+    // TODO: 필요시 추가 구현
+    private void handleChangeSession(CMSessionEvent se) {
+        System.out.println("User " + se.getUserName() + " changed to session: " + se.getSessionName());
+    }
+
 }
