@@ -22,8 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Vector;
+import java.util.*;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -223,6 +222,8 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     for (GShape shape : this.shapes) {
       if (shape.isSelected()) {
         shape.setLineColor(lineColor);
+        //
+        Main.broadcastUpdate(shape.cloneShapes());
       }
     }
     this.repaint();
@@ -232,6 +233,8 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     for (GShape shape : this.shapes) {
       if (shape.isSelected()) {
         shape.setFillColor(fillColor);
+        //
+        Main.broadcastUpdate(shape.cloneShapes());
       }
     }
     this.repaint();
@@ -328,9 +331,17 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     repaint();
   }
 
+  private GShape transformInitGShape;
   private void initTransforming(int x1, int y1) {
+      if (this.selectedShape != null) {
+          transformInitGShape = this.selectedShape.cloneShapes();
+      } else {
+          transformInitGShape = null;
+      }
+
     if (this.transformer instanceof GDrawer) {
       this.selectedShape = this.shapeTool.clone();
+      transformInitGShape = this.selectedShape.cloneShapes();
       this.setColorInfo();
     }
 
@@ -360,13 +371,21 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
         this.selectedShape = null;
         this.isUpdated = this.shapes.size() > 0;
       } else {
+        // 도형 추가
         this.shapes.add(this.selectedShape);
 
         this.clip.tempshapes.clear();
         this.isUpdated = true;
-
+        
+        UUID uuid = UUID.randomUUID();
+        String uniqueKey = uuid.toString();
+        this.selectedShape.setShapeId(uniqueKey);
         Main.broadcastShape(this.selectedShape);
       }
+    } else if (this.transformInitGShape != null) {
+      // 도형 이동
+        System.out.println("도형 이동!");
+        Main.broadcastUpdate(this.selectedShape.cloneShapes());
     }
     this.repaint();
   }
@@ -480,7 +499,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     } else {
       this.eAnchor = confirmAnchorSelected(x, y);
       this.setCursor(onShape(x, y) == EOnState.eOnShape ? CursorManager.MOVE_CURSOR
-          : (this.eAnchor != null && selectedShape.isSelected()) ? getResizeCursor(eAnchor)
+              : (this.eAnchor != null && selectedShape.isSelected()) ? getResizeCursor(eAnchor)
               : CursorManager.DEFAULT_CURSOR);
     }
 
@@ -627,7 +646,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
         }
       }
       if (shapeTool.geteDrawingStyle() == EDrawingStyle.eNPointDrawing
-          && eDrawingState == EDrawingState.eTransforming) {
+              && eDrawingState == EDrawingState.eTransforming) {
         finishTransforming(e.getX(), e.getY());
         eDrawingState = EDrawingState.eIdle;
       }
@@ -636,7 +655,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     @Override
     public void mouseMoved(MouseEvent e) {
       if (shapeTool.geteDrawingStyle() == EDrawingStyle.eNPointDrawing
-          && eDrawingState == EDrawingState.eTransforming) {
+              && eDrawingState == EDrawingState.eTransforming) {
         keepTransforming(e.getX(), e.getY());
       } else if (eDrawingState == EDrawingState.eIdle) {
         changeCursor(e.getX(), e.getY());
@@ -665,7 +684,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
 
   @Override
   public int print(Graphics graphics, PageFormat pageFormat, int pageIndex)
-      throws PrinterException {
+          throws PrinterException {
     Graphics2D grapchis2D;
 
     if (pageIndex == 0) {

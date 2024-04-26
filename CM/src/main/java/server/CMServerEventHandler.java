@@ -1,5 +1,6 @@
 package server;
 
+import client.shapes.GShape;
 import com.google.gson.Gson;
 import kr.ac.konkuk.ccslab.cm.entity.CMUser;
 import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
@@ -31,8 +32,40 @@ public class CMServerEventHandler implements CMAppEventHandler {
 
     private void processDummyEvent(CMEvent cmEvent) {
         CMDummyEvent due = (CMDummyEvent) cmEvent;
-        CMServerApp.shapeStringList.add(due.getDummyInfo());
-        System.out.println("dummy msg: " + due.getDummyInfo());
+        String message = due.getDummyInfo();
+        String type = message.substring(0, 3);
+        String content = message.substring(3);
+        GShape requestShape = Tools.deserializeString(content);
+        if (requestShape == null) {
+            System.out.println("서버로 들어오는 요청 잘못됨.");
+            return;
+        }
+        switch (type) {
+            case "ADD" -> {
+                CMServerApp.shapeStringList.add(requestShape);
+                System.out.println("추가됨");
+                System.out.println(CMServerApp.shapeStringList);
+            }
+            case "UPD" -> {
+                for (int i = 0; i < CMServerApp.shapeStringList.size(); i++) {
+                    if (CMServerApp.shapeStringList.get(i).equals(requestShape)) {
+                        CMServerApp.shapeStringList.set(i, requestShape);
+                        System.out.println("업뎃됨");
+                        System.out.println(CMServerApp.shapeStringList);
+                        break;
+                    }
+                }
+            }
+            case "DEL" -> {
+                for (GShape gShape : CMServerApp.shapeStringList) {
+                    if (gShape.equals(requestShape)) {
+                        CMServerApp.shapeStringList.remove(gShape);
+                        System.out.println("삭제됨");
+                        System.out.println(CMServerApp.shapeStringList);
+                    }
+                }
+            }
+        }
     }
 
     private void processSessionEvent(CMEvent cmEvent) {
