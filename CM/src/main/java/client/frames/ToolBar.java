@@ -46,7 +46,9 @@ public class ToolBar extends JToolBar {
 		colorBucketBtn.setIcon(new ImageIcon("images/colorbucket.png"));
 		colorBucketBtn.addActionListener(new ColorBucketBtnHandler());
 
+		this.add(Box.createRigidArea(new Dimension(10, 0)));
 		this.add(colorBtn);
+		this.add(Box.createRigidArea(new Dimension(10, 0)));
 		this.add(colorBucketBtn);
 
 		this.previewPanel = new PreviewPanel();

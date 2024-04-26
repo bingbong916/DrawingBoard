@@ -38,7 +38,7 @@ public class MainFrame extends JFrame {
   @SuppressWarnings("static-access")
   public MainFrame() {
     // attribute
-    this.setSize(1000, 800);
+    this.setSize(1100, 800);
     this.setTitle("Drawing Board :: 협동분산시스템 6팀");
     this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     ImageIcon img = new ImageIcon("images/canvas.png");
