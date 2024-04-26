@@ -213,6 +213,8 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
       if (shape.isSelected()) {
         shape.setStroke(index);
         shape.setStrokeDash(dash);
+        //
+        Main.broadcastUpdate(shape.cloneShapes());
       }
     }
     this.repaint();
