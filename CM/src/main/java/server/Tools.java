@@ -4,6 +4,8 @@ import client.shapes.GShape;
 
 import java.io.*;
 import java.util.Base64;
+import java.util.List;
+import java.util.Map;
 
 public class Tools {
     public static GShape deserializeString(String encodedShape) {
@@ -17,7 +19,7 @@ public class Tools {
             return null;
         }
     }
-    public static String serializeShape(GShape shape) {
+    public static <T> String serializeShape(T shape) {
         try {
             ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
             ObjectOutputStream out = new ObjectOutputStream(byteArrayOut);
