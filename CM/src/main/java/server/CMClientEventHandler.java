@@ -19,10 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 public class CMClientEventHandler implements CMAppEventHandler {
     private CMClientStub m_ClientStub;
@@ -93,13 +90,62 @@ public class CMClientEventHandler implements CMAppEventHandler {
     private void processDummyEvent(CMEvent cmEvent) {
         CMDummyEvent due = (CMDummyEvent) cmEvent;
         String user = due.getSender();
+
+        String message = due.getDummyInfo();
+        String type = message.substring(0, 3);
+        String content = message.substring(3);
+
         // TODO: 이름 겹치게 로그인 안 되도록 해야 함.
         if (user.equals(m_ClientStub.getMyself().getName())) {
             System.out.println("◎● Log: 내 메시지라 추가 안됨.");
             return;
         }
 
-        System.out.println("◎● Log: " + due.getDummyInfo());
+        DrawingPanel drawingPanel = mainFrame.getDrawingPanel();
+        Vector<GShape> gShapes = (Vector<GShape>) drawingPanel.getShapes();
+        System.out.println(gShapes);
+        switch (type) {
+            case "ADD" -> {
+                System.out.println("◎● Log: 도형 추가됨");
+                GShape requestShape = Tools.deserializeString(content);
+                if (requestShape == null) {
+                    System.out.println("◎● Log: ADD요청 - 형식 잘못됨.");
+                    return;
+                }
+                gShapes.add(requestShape);
+            }
+            case "UPD" -> {
+                GShape requestShape = Tools.deserializeString(content);
+                if (requestShape == null) {
+                    System.out.println("◎● Log: UPDATE요청 - 형식 잘못됨.");
+                    return;
+                }
+
+                for (int i = 0; i < gShapes.size(); i++) {
+                    if (gShapes.get(i).equals(requestShape)) {
+                        System.out.println("◎● Log: 도형 변경됨");
+                        gShapes.set(i, requestShape);
+                        break;
+                    }
+                }
+            }
+            case "DEL" -> {
+                GShape requestShape = Tools.deserializeString(content);
+                if (requestShape == null) {
+                    System.out.println("◎● Log: DELETE요청 - 형식 잘못됨.");
+                    return;
+                }
+                for (GShape gShape : gShapes) {
+                    if (gShape.equals(requestShape)) {
+                        System.out.println("◎● Log: 도형 삭제됨");
+                        gShapes.remove(gShape);
+                    }
+                }
+                System.out.println(gShapes);
+            }
+        }
+
+        /*System.out.println("◎● Log: " + due.getDummyInfo());
         GShape result = Tools.deserializeString(due.getDummyInfo());
         if (result instanceof GLine) {
             System.out.println(" - GLine 도착 ●◎");
@@ -121,7 +167,7 @@ public class CMClientEventHandler implements CMAppEventHandler {
         }
         DrawingPanel drawingPanel = mainFrame.getDrawingPanel();
         Vector<GShape> gShapes = (Vector<GShape>) drawingPanel.getShapes();
-        gShapes.add(result);
+        gShapes.add(result);*/
         mainFrame.getDrawingPanel().repaint();
     }
 

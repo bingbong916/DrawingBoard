@@ -19,6 +19,14 @@ import client.transformer.GResizerDto;
 
 @SuppressWarnings("serial")
 abstract public class GShape implements Serializable {
+	private String shapeId;
+	public String getShapeId() {
+		return shapeId;
+	}
+	public void setShapeId(String shapeId) {
+		this.shapeId = shapeId;
+	}
+
 	// attributes
 	protected int tMoveX, tMoveY;
 
@@ -35,6 +43,24 @@ abstract public class GShape implements Serializable {
 	private EDrawingStyle eDrawingStyle;
 
 	private AffineTransform af = null;
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null || getClass() != obj.getClass()) return false;
+
+		GShape gShape = (GShape) obj;
+
+		System.out.println("비교중!!!!!");
+
+        return gShape.getShapeId().equals(this.shapeId);
+		/*return gShape.lineColor.equals(this.lineColor)
+				&& (this.fillColor == null || gShape.fillColor.equals(this.fillColor))
+				&& gShape.stroke == this.stroke
+				&& gShape.shape.equals(this.shape)
+				&& gShape.tMoveX == this.tMoveX
+				&& gShape.tMoveY == this.tMoveY;*/
+	}
 
 	public enum EOnState {
 		eOnShape, eOnResize, eOnRotate;
@@ -75,7 +101,7 @@ abstract public class GShape implements Serializable {
 		affineTransform.translate(10, 10);
 		this.shape = affineTransform.createTransformedShape(this.shape);
 	}
-	
+
 	public EOnState onShape(int x, int y) {
 		if (this.selected) {
 			EAnchors eAnchor = this.gAnchors.onShape(x, y);
@@ -107,7 +133,7 @@ abstract public class GShape implements Serializable {
 	public void setStroke(int index) {
 		this.stroke = index;
 	}
-	
+
 	public void setStrokeDash(float[] dash) {
 		this.dash = dash;
 	}
@@ -141,7 +167,7 @@ abstract public class GShape implements Serializable {
 			graphics2d.setStroke(new BasicStroke(this.stroke, BasicStroke.CAP_BUTT,
 					BasicStroke.JOIN_MITER, 1.0f, this.dash, 0.0f));
 		}
-		
+
 		if (this.fillColor != null) {
 			graphics2d.setColor(fillColor);
 			graphics2d.fill(this.shape);
@@ -150,7 +176,7 @@ abstract public class GShape implements Serializable {
 		graphics2d.setColor(this.lineColor);
 		graphics2d.draw(this.shape);
 		graphics2d.setStroke(new BasicStroke(1));
-		
+
 		if (this.selected) {
 			this.gAnchors.setBoundingRect(this.shape.getBounds());
 			this.gAnchors.draw(graphics2d);
@@ -191,11 +217,11 @@ abstract public class GShape implements Serializable {
 			return null;
 		}
 	}
-	
+
 	public Rectangle getBounds() {
 		return this.shape.getBounds();
 	}
-	
+
 	public abstract void finishMoving(Graphics2D graphics2d, int x, int y);
 
 	public abstract void setInitPoint(int x1, int y1);
