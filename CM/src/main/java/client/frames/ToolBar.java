@@ -4,10 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JRadioButton;
-import javax.swing.JToolBar;
+import javax.swing.*;
 
 import client.global.Constants.EShapes;
 
@@ -16,8 +13,8 @@ public class ToolBar extends JToolBar {
 
 	private ActionListener actionListener;
 	private DrawingPanel drawingPanel;
-
-	//private PreviewPanel previewPanel;
+	private PreviewPanel previewPanel;
+	private ColorPanel colorPanel;
 	
 
 	public ToolBar() {
@@ -36,6 +33,14 @@ public class ToolBar extends JToolBar {
 			this.add(button);
 			buttonGroup.add(button);
 		}
+
+		this.addSeparator();
+		this.colorPanel = new ColorPanel();
+		this.add(colorPanel);
+
+		JButton colorBtn = new JButton();
+		colorBtn.setIcon(new ImageIcon("images/imagerect.png"));
+		this.add(colorBtn);
 
 //		this.previewPanel = new PreviewPanel();
 //		this.addSeparator();
