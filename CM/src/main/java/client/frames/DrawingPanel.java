@@ -156,7 +156,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     return isUpdated;
   }
 
-  public Object getShapes() {
+  public Vector<GShape> getShapes() {
     return this.shapes;
   }
 

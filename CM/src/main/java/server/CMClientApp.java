@@ -1,5 +1,7 @@
 package server;
 
+import client.frames.MainFrame;
+import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 
 import java.io.BufferedReader;
@@ -7,12 +9,16 @@ import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import static java.lang.System.exit;
+
 public class CMClientApp {
-    private CMClientApp cmClientApp;
     private CMClientStub cmClientStub;
     private CMClientEventHandler cmClientEventHandler;
-    public CMClientApp getCmClientApp() {
-        return cmClientApp;
+
+    public CMClientApp(MainFrame mainFrame) {
+        this.cmClientStub = new CMClientStub();
+        this.cmClientEventHandler = new CMClientEventHandler(cmClientStub, mainFrame);
+        cmClientStub.setAppEventHandler(cmClientEventHandler);
     }
 
     public CMClientStub getCmClientStub() {
@@ -24,22 +30,7 @@ public class CMClientApp {
     }
 
     public boolean init() {
-        cmClientApp = new CMClientApp();
-        cmClientStub = new CMClientStub();
-        cmClientEventHandler = new CMClientEventHandler(cmClientStub);
-
-        boolean ret = false;
-        // initialize CM
-        cmClientStub.setAppEventHandler(cmClientEventHandler);
-        ret = cmClientStub.startCM();
-
-        if (ret) {
-            System.out.println("init success");
-            return true;
-        } else {
-            System.out.println("init error!");
-            return false;
-        }
+        return cmClientStub.startCM();
     }
 
     public void startChat() {
@@ -56,38 +47,28 @@ public class CMClientApp {
             if (strMessage.equals("exit")) {
                 break;
             }
-            cmClientStub.chat("/b", strMessage);
+            cmClientStub.chat("/s", strMessage);
         }
     }
 
-    public boolean loginProcess(CMClientApp client) {
-        String strUserName = null;
-        String strPassword = null;
-        boolean bRequestResult = false;
-        Console console = System.console();
-        System.out.print("user name: ");
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        try {
-            strUserName = br.readLine();
-            if(console == null)
-            {
-                System.out.print("password: ");
-                strPassword = br.readLine();
-            }
-            else
-                strPassword = new String(console.readPassword("password: "));
+    public boolean loginProcess(String userName, String password) {
+        boolean requestResult = cmClientStub.loginCM(userName, password);
+        if(requestResult) {
+            System.out.println("◎● Log: Login request sent successfully.");
+        } else {
+            System.err.println("◎● Log: Failed to send login request.");
+        }
+        return requestResult;
+    }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+    public boolean logoutProcess() {
+        boolean requestResult = cmClientStub.logoutCM();
+        if (requestResult) {
+            System.out.println("◎● Log: Logout request sent successfully.");
+            exit(0);
+        } else {
+            System.out.println("◎● Log: Failed to send logout request!");
         }
-        bRequestResult = client.getCmClientStub().loginCM(strUserName, strPassword);
-        if(bRequestResult)
-            System.out.println("successfully sent the login request.");
-        else {
-            System.err.println("failed the login request!");
-            return false;
-        }
-        return true;
+        return false;
     }
 }

@@ -13,11 +13,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 public class MainFrame extends JFrame {
-
+  public static CMClientApp cmClientApp;
   private final MenuBar menuBar;
   private final ToolBar toolBar;
   private DrawingPanel drawingPanel;
   private JTabbedPane tabPane;
+  private JButton joinLeaveButton;
   private JTextArea logArea;
   private JScrollPane scrollPane;
   private final Vector<JPanel> drawingPanelList;
@@ -37,6 +38,8 @@ public class MainFrame extends JFrame {
 
   @SuppressWarnings("static-access")
   public MainFrame() {
+    cmClientApp = new CMClientApp(this);
+    cmClientApp.init();
     // attribute
     this.setSize(1100, 800);
     this.setTitle("Drawing Board :: 협동분산시스템 6팀");
@@ -52,14 +55,16 @@ public class MainFrame extends JFrame {
     this.addWindowListener(exitHandler);
 
     // components
-    this.drawingPanel = new DrawingPanel();
-    this.add(drawingPanel, borderlayout.CENTER);
+    drawingPanel = new DrawingPanel();
+    toolBar = new ToolBar();
+    menuBar = new MenuBar();
 
-    this.toolBar = new ToolBar();
-    this.add(this.toolBar, borderlayout.NORTH);
+    // 비활성화
+    disableComponents();
 
-    this.menuBar = new MenuBar();
-    this.setJMenuBar(this.menuBar);
+    add(drawingPanel, BorderLayout.CENTER);
+    add(toolBar, BorderLayout.NORTH);
+    setJMenuBar(menuBar);
 
 
     logArea = new JTextArea();
@@ -70,7 +75,28 @@ public class MainFrame extends JFrame {
     add(scrollPane, BorderLayout.EAST);
     scrollPane.setPreferredSize(new Dimension(200, this.getHeight()));
 
-    setVisible(true);
+    joinLeaveButton = new JButton("Join");
+
+    joinLeaveButton.addActionListener(e -> {
+      if (joinLeaveButton.getText().equals("Join")) {
+        attemptLogin();
+      } else {
+        cmClientApp.logoutProcess();
+        joinLeaveButton.setText("Join");
+        disableComponents();
+      }
+    });
+
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.add(joinLeaveButton);
+    add(buttonPanel, BorderLayout.SOUTH);
+
+    addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent e) {
+        cmClientApp.logoutProcess();
+      }
+    });
+
 //    this.tabPane = new JTabbedPane();
 //    TabbedPaneHandler tabbedPaneHandler = new TabbedPaneHandler();
 //    tabPane.addTab("File", this.drawingPanel);
@@ -91,6 +117,51 @@ public class MainFrame extends JFrame {
     // association
     this.toolBar.associate(drawingPanel);
     this.menuBar.associate(drawingPanel);
+  }
+  private void attemptLogin() {
+    JTextField usernameField = new JTextField();
+    JPasswordField passwordField = new JPasswordField();
+    final JComponent[] inputs = new JComponent[] {
+            new JLabel("username"),
+            usernameField,
+            new JLabel("password"),
+            passwordField
+    };
+    int result = JOptionPane.showConfirmDialog(this, inputs, "Login", JOptionPane.DEFAULT_OPTION);
+    if (result == JOptionPane.OK_OPTION) {
+      String username = usernameField.getText();
+      String password = new String(passwordField.getPassword());
+      boolean loginSuccess = cmClientApp.loginProcess(username, password);
+      if (loginSuccess) {
+        joinLeaveButton.setText("Leave");
+        enableComponents();
+      } else {
+        JOptionPane.showMessageDialog(this, "로그인 실패", "Login Error", JOptionPane.ERROR_MESSAGE);
+      }
+    }
+  }
+  private void enableComponents() {
+    SwingUtilities.invokeLater(() -> {
+      for (Component comp : toolBar.getComponents()) {
+        comp.setEnabled(true);
+      }
+      for (int i = 0; i < menuBar.getMenuCount(); i++) {
+        menuBar.getMenu(i).setEnabled(true);
+      }
+      drawingPanel.setEnabled(true);
+    });
+  }
+
+  private void disableComponents() {
+    SwingUtilities.invokeLater(() -> {
+      for (Component comp : toolBar.getComponents()) {
+        comp.setEnabled(false);
+      }
+      for (int i = 0; i < menuBar.getMenuCount(); i++) {
+        menuBar.getMenu(i).setEnabled(false);
+      }
+      drawingPanel.setEnabled(false);
+    });
   }
 
   public void updateLog(String message) {

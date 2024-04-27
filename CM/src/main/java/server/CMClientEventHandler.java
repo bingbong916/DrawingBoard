@@ -30,9 +30,9 @@ public class CMClientEventHandler implements CMAppEventHandler {
         this.mainFrame = mainFrame;
     }
 
-
-    public CMClientEventHandler(CMClientStub clientStub) {
+    public CMClientEventHandler(CMClientStub clientStub, MainFrame mainFrame) {
         this.m_ClientStub = clientStub;
+        this.mainFrame = mainFrame;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class CMClientEventHandler implements CMAppEventHandler {
             System.out.println(newGShape);
             // TODO: 이거 drawingPanel 생성이 되기 전임...
             DrawingPanel drawingPanel = mainFrame.getDrawingPanel();
-            Vector<GShape> gShapes = (Vector<GShape>) drawingPanel.getShapes();
+            Vector<GShape> gShapes = drawingPanel.getShapes();
             gShapes.add(newGShape);
         }
         mainFrame.getDrawingPanel().repaint();
@@ -95,81 +95,52 @@ public class CMClientEventHandler implements CMAppEventHandler {
         String type = message.substring(0, 3);
         String content = message.substring(3);
 
-        // TODO: 이름 겹치게 로그인 안 되도록 해야 함.
         if (user.equals(m_ClientStub.getMyself().getName())) {
             System.out.println("◎● Log: 내 메시지라 추가 안됨.");
             return;
         }
 
-        DrawingPanel drawingPanel = mainFrame.getDrawingPanel();
-        Vector<GShape> gShapes = (Vector<GShape>) drawingPanel.getShapes();
-        System.out.println(gShapes);
-        switch (type) {
-            case "ADD" -> {
-                System.out.println("◎● Log: 도형 추가됨");
-                GShape requestShape = Tools.deserializeString(content);
-                if (requestShape == null) {
-                    System.out.println("◎● Log: ADD요청 - 형식 잘못됨.");
-                    return;
-                }
-                gShapes.add(requestShape);
-            }
-            case "UPD" -> {
-                GShape requestShape = Tools.deserializeString(content);
-                if (requestShape == null) {
-                    System.out.println("◎● Log: UPDATE요청 - 형식 잘못됨.");
-                    return;
-                }
-
-                for (int i = 0; i < gShapes.size(); i++) {
-                    if (gShapes.get(i).equals(requestShape)) {
+        SwingUtilities.invokeLater(() -> {
+            DrawingPanel drawingPanel = mainFrame.getDrawingPanel();
+            Vector<GShape> gShapes = drawingPanel.getShapes();
+            synchronized (gShapes) {
+                switch (type) {
+                    case "ADD" -> {
+                        GShape requestShape = Tools.deserializeString(content);
+                        if (requestShape == null) {
+                            System.out.println("◎● Log: ADD요청 - 형식 잘못됨.");
+                            return;
+                        }
+                        if (!gShapes.contains(requestShape)) {
+                            gShapes.add(requestShape);
+                            System.out.println("◎● Log: 도형 추가됨");
+                        }
+                    }
+                    case "UPD" -> {
+                        GShape requestShape = Tools.deserializeString(content);
+                        if (requestShape == null) {
+                            System.out.println("◎● Log: UPDATE요청 - 형식 잘못됨.");
+                            return;
+                        }
+                        gShapes.replaceAll(g -> g.equals(requestShape) ? requestShape : g);
                         System.out.println("◎● Log: 도형 변경됨");
-                        gShapes.set(i, requestShape);
-                        break;
                     }
-                }
-            }
-            case "DEL" -> {
-                GShape requestShape = Tools.deserializeString(content);
-                if (requestShape == null) {
-                    System.out.println("◎● Log: DELETE요청 - 형식 잘못됨.");
-                    return;
-                }
-                for (GShape gShape : gShapes) {
-                    if (gShape.equals(requestShape)) {
+                    case "DEL" -> {
+                        GShape requestShape = Tools.deserializeString(content);
+                        if (requestShape == null) {
+                            System.out.println("◎● Log: DELETE요청 - 형식 잘못됨.");
+                            return;
+                        }
+                        gShapes.removeIf(g -> g.equals(requestShape));
                         System.out.println("◎● Log: 도형 삭제됨");
-                        gShapes.remove(gShape);
                     }
                 }
-                System.out.println(gShapes);
+                mainFrame.getDrawingPanel().repaint();
             }
-        }
-
-        /*System.out.println("◎● Log: " + due.getDummyInfo());
-        GShape result = Tools.deserializeString(due.getDummyInfo());
-        if (result instanceof GLine) {
-            System.out.println(" - GLine 도착 ●◎");
-        } else if (result instanceof GOval) {
-            System.out.println(" - GOval 도착 ●◎");
-        } else if (result instanceof GPencil) {
-            System.out.println(" - GPencil 도착 ●◎");
-        } else if (result instanceof GPolygon) {
-            System.out.println(" - GPolygon 도착 ●◎");
-        } else if (result instanceof GTextBox) {
-            System.out.println(" - GTextBox 도착 ●◎");
-        } else if (result instanceof GRectangle) {
-            System.out.println(" - GRectangle 도착 ●◎");
-        } else if (result instanceof GTriangle) {
-            System.out.println(" - GTriangle 도착 ●◎");
-        } else {
-            System.out.println("◎● Log: GShape 객체가 아닌 것이 도착함.\n" + result);
-            return;
-        }
-        DrawingPanel drawingPanel = mainFrame.getDrawingPanel();
-        Vector<GShape> gShapes = (Vector<GShape>) drawingPanel.getShapes();
-        gShapes.add(result);*/
-        mainFrame.getDrawingPanel().repaint();
+            System.out.println(gShapes);
+        });
     }
+
 
     private void processSessionEvent(CMEvent cmEvent) {
         CMSessionEvent se = (CMSessionEvent) cmEvent;
@@ -187,7 +158,7 @@ public class CMClientEventHandler implements CMAppEventHandler {
                 handleSessionRemoveUser(se);
                 break;
             default:
-                System.out.println("지원하지 않는 session event ID: " + se.getID());
+                System.out.println("◎● Log: 지원하지 않는 session event ID: " + se.getID());
                 break;
         }
     }

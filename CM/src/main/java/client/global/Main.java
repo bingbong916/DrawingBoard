@@ -12,20 +12,17 @@ import java.util.List;
 import static java.lang.System.exit;
 
 public class Main {
-	public static CMClientApp cmClientApp = new CMClientApp();
 	public static MainFrame mainFrame = new MainFrame();
+	public static CMClientApp cmClientApp = new CMClientApp(mainFrame);
 
 	public static void main(String[] args) {
-		boolean isInit = cmClientApp.init();
-		if (isInit) {
-			if (cmClientApp.loginProcess(cmClientApp)) {
-				startPaint(cmClientApp);
-				cmClientApp.startChat();
-			} else {
-				exit(1);
-			}
+		mainFrame = new MainFrame();
+		cmClientApp = new CMClientApp(mainFrame);
+		if (cmClientApp.init()) {
+			startPaint(cmClientApp);
+			cmClientApp.startChat();
 		} else {
-			exit(2);
+			System.exit(1);
 		}
 	}
 
