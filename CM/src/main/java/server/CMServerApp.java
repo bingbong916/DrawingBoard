@@ -1,12 +1,13 @@
 package server;
 
+import client.shapes.GShape;
 import kr.ac.konkuk.ccslab.cm.stub.CMServerStub;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CMServerApp {
-    public static List<String> shapeStringList = new ArrayList<>();
+    public static List<GShape> shapeStringList = new ArrayList<>();
     public static CMServerStub m_serverStub;
     private CMServerEventHandler m_eventHandler;
 
