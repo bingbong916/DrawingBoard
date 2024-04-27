@@ -582,12 +582,15 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
   }
 
   public void delete() {
-    for (int i = this.shapes.size() - 1; i >= 0; i--) {
-      if (this.shapes.get(i).isSelected()) {
-        this.shapes.remove(i);
-        this.selectedShape = null;
+    List<GShape> toDelete = new ArrayList<>();
+    for (GShape shape : shapes) {
+      if (shape.isSelected()) {
+        toDelete.add(shape);
       }
     }
+    shapes.removeAll(toDelete);
+    toDelete.forEach(Main::broadcastDelete);
+    this.selectedShape = null;
     this.repaint();
   }
 

@@ -57,13 +57,9 @@ public class CMServerEventHandler implements CMAppEventHandler {
                 }
             }
             case "DEL" -> {
-                for (GShape gShape : CMServerApp.shapeStringList) {
-                    if (gShape.equals(requestShape)) {
-                        CMServerApp.shapeStringList.remove(gShape);
-                        System.out.println("삭제됨");
-                        System.out.println(CMServerApp.shapeStringList);
-                    }
-                }
+                CMServerApp.shapeStringList.removeIf(gShape -> gShape.equals(requestShape));
+                System.out.println("삭제됨");
+                System.out.println(CMServerApp.shapeStringList);
             }
         }
     }
