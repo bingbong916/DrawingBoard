@@ -51,7 +51,7 @@ abstract public class GShape implements Serializable {
 
 		GShape gShape = (GShape) obj;
 
-		System.out.println("비교중!!!!!");
+		System.out.println("◎● Log: 비교중!!!!!");
 
         return gShape.getShapeId().equals(this.shapeId);
 		/*return gShape.lineColor.equals(this.lineColor)

@@ -42,6 +42,7 @@ public class CMClientEventHandler implements CMAppEventHandler {
                 processSessionEvent(cmEvent);
             }
             case CMInfo.CM_DUMMY_EVENT -> {
+                // TODO: user name 반환 수정 필요.
                 System.out.println("◎● Log: Message From \"" + cmEvent.getSender() + "\"");
                 // TODO: user name - SERVER로 로그인 못하게 해야 됨.
                 if (cmEvent.getSender().equals("SERVER")) {
