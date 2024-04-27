@@ -63,10 +63,10 @@ public class Constants {
 
 	public enum EShapes {
 		eSelection(new GSelection(), "images/drag.png", "images/drag-selected.png", "selection", 1),
-		eRectangle(new GRectangle(), "images/rectangle.png", "images/rectangle-selected.png", "rectangle", 0),
-		eOval(new GOval(), "images/oval.png", "images/oval-selected.png", "oval", 0),
-		eTriangle(new GTriangle(), "images/triangle.png", "images/triangle-selected.png", "triangle", 0),
-		eLine(new GLine(), "images/line.png", "images/line-selected.png", "line", 0),
+		eRectangle(new GRectangle(), "images/rectangle.png", "images/rectangle_selected.png", "rectangle", 0),
+		eOval(new GOval(), "images/oval.png", "images/oval_selected.png", "oval", 0),
+		eTriangle(new GTriangle(), "images/triangle.png", "images/triangle_selected.png", "triangle", 0),
+		eLine(new GLine(), "images/line.png", "images/line_selected.png", "line", 0),
 		//ePolygon(new GPolygon(), "images/polygon.png", "images/polygon-selected.png", "polygon", 0),
 		eTextBox(new GTextBox(), "images/text.png", "images/text-selected.png", "text", 0),
 		ePencil(new GPencil(), "images/pencil.png", "images/pencil-selected.png", "pencil", 0);

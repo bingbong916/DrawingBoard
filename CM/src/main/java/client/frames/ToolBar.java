@@ -23,7 +23,7 @@ public class ToolBar extends JToolBar {
 		
 		for (EShapes eButton : EShapes.values()) {
 			JRadioButton button = new JRadioButton();
-			button.setPreferredSize(new Dimension(60,60));
+			button.setPreferredSize(new Dimension(70,70));
 			button.setBackground(Color.white); // toString() = name()
 			button.setIcon(new ImageIcon(eButton.getImage()));
 			button.setSelectedIcon(new ImageIcon(eButton.getSelectedImage()));
