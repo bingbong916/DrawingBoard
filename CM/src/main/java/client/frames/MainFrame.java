@@ -87,9 +87,11 @@ public class MainFrame extends JFrame {
       }
     });
 
-    JPanel buttonPanel = new JPanel();
-    buttonPanel.add(joinLeaveButton);
-    add(buttonPanel, BorderLayout.SOUTH);
+    JPanel rightPanel = new JPanel(new BorderLayout());
+    rightPanel.add(scrollPane, BorderLayout.CENTER);
+    rightPanel.add(joinLeaveButton, BorderLayout.SOUTH);
+
+    add(rightPanel, BorderLayout.EAST);
 
     addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent e) {
