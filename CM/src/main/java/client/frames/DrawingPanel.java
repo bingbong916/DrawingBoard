@@ -156,7 +156,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     return isUpdated;
   }
 
-  public Object getShapes() {
+  public Vector<GShape> getShapes() {
     return this.shapes;
   }
 
@@ -203,7 +203,20 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
       this.eCurrentState = ECurrentState.eSelecting;
     }
   }
+  public void addMouseHandling() {
+    MouseHandler mouseHandler = new MouseHandler();
+    this.addMouseListener(mouseHandler);
+    this.addMouseMotionListener(mouseHandler);
+  }
 
+  public void removeMouseHandling() {
+    for (MouseListener listener : this.getMouseListeners()) {
+      this.removeMouseListener(listener);
+    }
+    for (MouseMotionListener listener : this.getMouseMotionListeners()) {
+      this.removeMouseMotionListener(listener);
+    }
+  }
   public void setSelection(GShape shapeTool) {
     this.shapeTool = shapeTool;
   }
@@ -656,8 +669,8 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-      if (shapeTool.geteDrawingStyle() == EDrawingStyle.eNPointDrawing
-              && eDrawingState == EDrawingState.eTransforming) {
+      if (shapeTool != null && shapeTool.geteDrawingStyle()
+              == EDrawingStyle.eNPointDrawing && eDrawingState == EDrawingState.eTransforming) {
         keepTransforming(e.getX(), e.getY());
       } else if (eDrawingState == EDrawingState.eIdle) {
         changeCursor(e.getX(), e.getY());
