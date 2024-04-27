@@ -149,6 +149,7 @@ public class MainFrame extends JFrame {
         menuBar.getMenu(i).setEnabled(true);
       }
       drawingPanel.setEnabled(true);
+      drawingPanel.addMouseHandling();
     });
   }
 
@@ -161,8 +162,10 @@ public class MainFrame extends JFrame {
         menuBar.getMenu(i).setEnabled(false);
       }
       drawingPanel.setEnabled(false);
+      drawingPanel.removeMouseHandling();
     });
   }
+
 
   public void updateLog(String message) {
     SwingUtilities.invokeLater(() -> {
