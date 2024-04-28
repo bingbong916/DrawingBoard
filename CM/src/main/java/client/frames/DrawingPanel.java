@@ -26,6 +26,7 @@ import java.util.*;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import client.global.ClientBroadcast;
 import client.global.Main;
 import client.menus.PopupMenu;
 import client.shapes.GAnchor;
@@ -227,7 +228,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
         shape.setStroke(index);
         shape.setStrokeDash(dash);
         //
-        Main.broadcastUpdate(shape.cloneShapes());
+        ClientBroadcast.broadcastUpdate(shape.cloneShapes());
       }
     }
     this.repaint();
@@ -238,7 +239,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
       if (shape.isSelected()) {
         shape.setLineColor(lineColor);
         //
-        Main.broadcastUpdate(shape.cloneShapes());
+        ClientBroadcast.broadcastUpdate(shape.cloneShapes());
       }
     }
     this.repaint();
@@ -249,7 +250,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
       if (shape.isSelected()) {
         shape.setFillColor(fillColor);
         //
-        Main.broadcastUpdate(shape.cloneShapes());
+        ClientBroadcast.broadcastUpdate(shape.cloneShapes());
       }
     }
     this.repaint();
@@ -395,12 +396,12 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
         UUID uuid = UUID.randomUUID();
         String uniqueKey = uuid.toString();
         this.selectedShape.setShapeId(uniqueKey);
-        Main.broadcastShape(this.selectedShape);
+        ClientBroadcast.broadcastShape(this.selectedShape);
       }
     } else if (this.transformInitGShape != null) {
       // 도형 이동
         System.out.println("도형 이동!");
-        Main.broadcastUpdate(this.selectedShape.cloneShapes());
+      ClientBroadcast.broadcastUpdate(this.selectedShape.cloneShapes());
     }
     this.repaint();
   }
@@ -589,7 +590,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
       }
     }
     shapes.removeAll(toDelete);
-    toDelete.forEach(Main::broadcastDelete);
+    toDelete.forEach(ClientBroadcast::broadcastDelete);
     this.selectedShape = null;
     this.repaint();
   }
