@@ -42,24 +42,24 @@ public class CMServerEventHandler implements CMAppEventHandler {
         }
         switch (type) {
             case "ADD" -> {
-                CMServerApp.shapeStringList.add(requestShape);
+                CMServerApp.shapeList.add(requestShape);
                 System.out.println("추가됨");
-                System.out.println(CMServerApp.shapeStringList);
+                System.out.println(CMServerApp.shapeList);
             }
             case "UPD" -> {
-                for (int i = 0; i < CMServerApp.shapeStringList.size(); i++) {
-                    if (CMServerApp.shapeStringList.get(i).equals(requestShape)) {
-                        CMServerApp.shapeStringList.set(i, requestShape);
+                for (int i = 0; i < CMServerApp.shapeList.size(); i++) {
+                    if (CMServerApp.shapeList.get(i).equals(requestShape)) {
+                        CMServerApp.shapeList.set(i, requestShape);
                         System.out.println("업뎃됨");
-                        System.out.println(CMServerApp.shapeStringList);
+                        System.out.println(CMServerApp.shapeList);
                         break;
                     }
                 }
             }
             case "DEL" -> {
-                CMServerApp.shapeStringList.removeIf(gShape -> gShape.equals(requestShape));
+                CMServerApp.shapeList.removeIf(gShape -> gShape.equals(requestShape));
                 System.out.println("삭제됨");
-                System.out.println(CMServerApp.shapeStringList);
+                System.out.println(CMServerApp.shapeList);
             }
         }
     }
@@ -83,9 +83,9 @@ public class CMServerEventHandler implements CMAppEventHandler {
         due.setHandlerSession(myself.getCurrentSession());
         due.setHandlerGroup(myself.getCurrentGroup());
         // 도형이 있는 경우
-        if (!CMServerApp.shapeStringList.isEmpty()) {
+        if (!CMServerApp.shapeList.isEmpty()) {
             Gson gson = new Gson();
-            String jsonString = gson.toJson(CMServerApp.shapeStringList);
+            String jsonString = gson.toJson(CMServerApp.shapeList);
             due.setDummyInfo(jsonString);
             CMServerApp.m_serverStub.send(due, receiver);
         } else { // 도형이 없는 경우
