@@ -12,8 +12,9 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import static client.global.Main.cmClientApp;
+
 public class MainFrame extends JFrame {
-  public static CMClientApp cmClientApp;
   private final MenuBar menuBar;
   private final ToolBar toolBar;
   private DrawingPanel drawingPanel;
@@ -38,8 +39,6 @@ public class MainFrame extends JFrame {
 
   @SuppressWarnings("static-access")
   public MainFrame() {
-    cmClientApp = new CMClientApp(this);
-    cmClientApp.init();
     // attribute
     this.setSize(1100, 800);
     this.setTitle("Drawing Board :: 협동분산시스템 6팀");
