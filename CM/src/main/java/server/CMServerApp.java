@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CMServerApp {
-    public static List<GShape> shapeStringList = new ArrayList<>();
+    public static List<GShape> shapeList = new ArrayList<>();
     public static CMServerStub m_serverStub;
     private CMServerEventHandler m_eventHandler;
 
