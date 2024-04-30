@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
+import client.global.Constants;
 import client.global.Constants.EShapes;
 
 @SuppressWarnings("serial")
@@ -14,8 +15,6 @@ public class ToolBar extends JToolBar {
 	private ActionListener actionListener;
 	private DrawingPanel drawingPanel;
 	private PreviewPanel previewPanel;
-	private ColorPanel colorPanel;
-	
 
 	public ToolBar() {
 		ButtonGroup buttonGroup = new ButtonGroup();
@@ -23,7 +22,7 @@ public class ToolBar extends JToolBar {
 		
 		for (EShapes eButton : EShapes.values()) {
 			JRadioButton button = new JRadioButton();
-			button.setPreferredSize(new Dimension(60,60));
+			button.setPreferredSize(new Dimension(70,70));
 			button.setBackground(Color.white); // toString() = name()
 			button.setIcon(new ImageIcon(eButton.getImage()));
 			button.setSelectedIcon(new ImageIcon(eButton.getSelectedImage()));
@@ -35,7 +34,25 @@ public class ToolBar extends JToolBar {
 		}
 
 		this.addSeparator();
-		this.colorPanel = new ColorPanel();
+//		this.colorPanel = new ColorPanel();
+//		this.add(colorPanel);
+		JPanel colorPanel = new JPanel();
+		colorPanel.setLayout(new GridLayout(2,9));
+		for (Constants.EColors ecolors : Constants.EColors.values()) {
+			JRadioButton button = new JRadioButton();
+			button.setPreferredSize(new Dimension(30, 30));
+			button.setBackground(Color.white);
+			button.setIcon(new ImageIcon(ecolors.getImage()));
+			button.setSelectedIcon(new ImageIcon(ecolors.getSelectedImage()));
+			button.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					drawingPanel.setLineColor(Color.decode(ecolors.getColorValue()));
+				}
+			});
+			colorPanel.add(button);
+			buttonGroup.add(button);
+		}
 		this.add(colorPanel);
 
 		JButton colorBtn = new JButton();
