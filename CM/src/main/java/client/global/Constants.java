@@ -19,26 +19,26 @@ import client.shapes.GTriangle;
 public class Constants {
 
 	public enum EColors {
-		eColor01("images/color01.png", "images/color01_selected.png", "0B0B0B"),
-		eColor02("images/color02.png", "images/color02_selected.png", "828881"),
-		eColor03("images/color03.png", "images/color03_selected.png", "870619"),
-		eColor04("images/color04.png", "images/color04_selected.png", "F11B26"),
-		eColor05("images/color05.png", "images/color05_selected.png", "FC7C25"),
-		eColor06("images/color06.png", "images/color06_selected.png", "F7EB01"),
-		eColor07("images/color07.png", "images/color07_selected.png", "22AB46"),
-		eColor08("images/color08.png", "images/color08_selected.png", "188DBB"),
-		eColor09("images/color09.png", "images/color09_selected.png", "444BD7"),
-		eColor10("images/color10.png", "images/color10_selected.png", "AC50A9"),
-		eColor11("images/color11.png", "images/color11_selected.png", "FCFCFC"),
-		eColor12("images/color12.png", "images/color12_selected.png", "C1C2C1"),
-		eColor13("images/color13.png", "images/color13_selected.png", "B5785B"),
-		eColor14("images/color14.png", "images/color14_selected.png", "F7ACC1"),
-		eColor15("images/color15.png", "images/color15_selected.png", "FAC602"),
-		eColor16("images/color16.png", "images/color16_selected.png", "E4D8A0"),
-		eColor17("images/color17.png", "images/color17_selected.png", "A9DD16"),
-		eColor18("images/color18.png", "images/color18_selected.png", "96D9EB"),
-		eColor19("images/color19.png", "images/color19_selected.png", "779AC8"),
-		eColor20("images/color20.png", "images/color20_selected.png", "C5BFEA");
+		eColor01("images/color01.png", "images/color01_selected.png", "0x0B0B0B"),
+		eColor02("images/color02.png", "images/color02_selected.png", "0x828881"),
+		eColor03("images/color03.png", "images/color03_selected.png", "0x870619"),
+		eColor04("images/color04.png", "images/color04_selected.png", "0xF11B26"),
+		eColor05("images/color05.png", "images/color05_selected.png", "0xFC7C25"),
+		eColor06("images/color06.png", "images/color06_selected.png", "0xF7EB01"),
+		eColor07("images/color07.png", "images/color07_selected.png", "0x22AB46"),
+		eColor08("images/color08.png", "images/color08_selected.png", "0x188DBB"),
+		eColor09("images/color09.png", "images/color09_selected.png", "0x444BD7"),
+		eColor10("images/color10.png", "images/color10_selected.png", "0xAC50A9"),
+		eColor11("images/color11.png", "images/color11_selected.png", "0xFCFCFC"),
+		eColor12("images/color12.png", "images/color12_selected.png", "0xC1C2C1"),
+		eColor13("images/color13.png", "images/color13_selected.png", "0xB5785B"),
+		eColor14("images/color14.png", "images/color14_selected.png", "0xF7ACC1"),
+		eColor15("images/color15.png", "images/color15_selected.png", "0xFAC602"),
+		eColor16("images/color16.png", "images/color16_selected.png", "0xE4D8A0"),
+		eColor17("images/color17.png", "images/color17_selected.png", "0xA9DD16"),
+		eColor18("images/color18.png", "images/color18_selected.png", "0x96D9EB"),
+		eColor19("images/color19.png", "images/color19_selected.png", "0x779AC8"),
+		eColor20("images/color20.png", "images/color20_selected.png", "0xC5BFEA");
 
 		private String image;
 		private String selectedimage;
@@ -56,9 +56,7 @@ public class Constants {
 			return selectedimage;
 		}
 
-		public String getColorvalue() {
-			return colorvalue;
-		}
+		public String getColorValue() { return colorvalue; }
 	}
 
 	public enum EShapes {
