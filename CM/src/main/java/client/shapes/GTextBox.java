@@ -8,7 +8,7 @@ import java.awt.Graphics2D;
 public class GTextBox extends GRectangle {
 
 	private Font font;
-	private String text = "";
+	private String text = "텍스트를 입력하세요.";
 
 	public GTextBox() {
 		this.font = new Font("Helvetica", Font.PLAIN, 12);

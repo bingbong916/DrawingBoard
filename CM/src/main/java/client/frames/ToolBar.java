@@ -34,8 +34,7 @@ public class ToolBar extends JToolBar {
 		}
 
 		this.addSeparator();
-//		this.colorPanel = new ColorPanel();
-//		this.add(colorPanel);
+
 		JPanel colorPanel = new JPanel();
 		colorPanel.setLayout(new GridLayout(2,9));
 		for (Constants.EColors ecolors : Constants.EColors.values()) {
