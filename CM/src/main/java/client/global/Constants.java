@@ -68,7 +68,6 @@ public class Constants {
 		//ePolygon(new GPolygon(), "images/polygon.png", "images/polygon-selected.png", "polygon", 0),
 		eTextBox(new GTextBox(), "images/text.png", "images/text-selected.png", "text", 0),
 		ePencil(new GPencil(), "images/pencil.png", "images/pencil-selected.png", "pencil", 0);
-		//eColor(new ColorMenu(), "image/")
 
 		private GShape shapeTool;
 		private String image;
