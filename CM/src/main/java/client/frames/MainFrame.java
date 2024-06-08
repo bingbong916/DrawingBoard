@@ -1,5 +1,6 @@
 package client.frames;
 
+import client.shapes.GShape;
 import server.CMClientApp;
 
 import java.awt.*;
@@ -81,6 +82,7 @@ public class MainFrame extends JFrame {
         attemptLogin();
       } else {
         cmClientApp.logoutProcess();
+        this.drawingPanel.setShapes(new Vector<GShape>());
         joinLeaveButton.setText("Join");
         disableComponents();
       }

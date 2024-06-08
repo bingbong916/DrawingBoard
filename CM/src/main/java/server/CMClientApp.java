@@ -65,7 +65,8 @@ public class CMClientApp {
         boolean requestResult = cmClientStub.logoutCM();
         if (requestResult) {
             System.out.println("◎● Log: Logout request sent successfully.");
-            exit(0);
+
+            //exit(0);
         } else {
             System.out.println("◎● Log: Failed to send logout request!");
         }

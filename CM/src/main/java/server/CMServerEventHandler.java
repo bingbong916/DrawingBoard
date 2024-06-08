@@ -70,7 +70,7 @@ public class CMServerEventHandler implements CMAppEventHandler {
             case CMSessionEvent.LOGIN -> {
                 System.out.println("[" + se.getUserName() + "] requests login.");
 
-                //sendShapesList(se.getUserName());
+                sendShapesList(se.getUserName());
             }
         }
     }
@@ -82,15 +82,21 @@ public class CMServerEventHandler implements CMAppEventHandler {
         CMDummyEvent due = new CMDummyEvent();
         due.setHandlerSession(myself.getCurrentSession());
         due.setHandlerGroup(myself.getCurrentGroup());
-        // 도형이 있는 경우
-        if (!CMServerApp.shapeList.isEmpty()) {
-            Gson gson = new Gson();
-            String jsonString = gson.toJson(CMServerApp.shapeList);
-            due.setDummyInfo(jsonString);
-            CMServerApp.m_serverStub.send(due, receiver);
-        } else { // 도형이 없는 경우
-            due.setDummyInfo("");
+
+        for (GShape gShape : CMServerApp.shapeList) {
+            String message = "ADD" + Tools.serializeShape(gShape);
+            due.setDummyInfo(message);
             CMServerApp.m_serverStub.send(due, receiver);
         }
+//        // 도형이 있는 경우
+//        if (!CMServerApp.shapeList.isEmpty()) {
+//            Gson gson = new Gson();
+//            String jsonString = gson.toJson(CMServerApp.shapeList);
+//            due.setDummyInfo(jsonString);
+//            CMServerApp.m_serverStub.send(due, receiver);
+//        } else { // 도형이 없는 경우
+//            due.setDummyInfo("");
+//            CMServerApp.m_serverStub.send(due, receiver);
+//        }
     }
 }
