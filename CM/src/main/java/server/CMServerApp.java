@@ -4,10 +4,13 @@ import client.shapes.GShape;
 import kr.ac.konkuk.ccslab.cm.stub.CMServerStub;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CMServerApp {
     public static List<GShape> shapeList = new ArrayList<>();
+    public static Map<String, String> lockMap = new HashMap<>();
     public static CMServerStub m_serverStub;
     private CMServerEventHandler m_eventHandler;
 

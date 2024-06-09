@@ -137,6 +137,14 @@ public class CMClientEventHandler implements CMAppEventHandler {
                         gShapes.removeIf(g -> g.equals(requestShape));
                         System.out.println("◎● Log: 도형 삭제됨");
                     }
+                    case "TRU" -> {
+                        // 서버로부터 락을 얻음
+                        System.out.println("TrueTrueTrueTrueTrueTrueTrue");
+                    }
+                    case "FAL" -> {
+                        // 락을 못얻음
+                        System.out.println("FalseFalseFalseFalseFalseFalse");
+                    }
                 }
                 mainFrame.getDrawingPanel().repaint();
             }
