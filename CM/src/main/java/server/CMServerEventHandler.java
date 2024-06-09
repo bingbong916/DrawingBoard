@@ -61,7 +61,39 @@ public class CMServerEventHandler implements CMAppEventHandler {
                 System.out.println("삭제됨");
                 System.out.println(CMServerApp.shapeList);
             }
+            case "LOC" -> { // 도형 수정 락
+                // 락이 기존에 없거나 본인 경우
+                String lockValue = CMServerApp.lockMap.getOrDefault(requestShape.getShapeId(), null);
+                if (lockValue == null || lockValue.equals(cmEvent.getSender())) {
+                    sendTrueOrFalse(true, cmEvent.getSender());
+                    CMServerApp.lockMap.put(requestShape.getShapeId(), cmEvent.getSender());
+                    System.out.println("LOCKLOCKLOCK111" + requestShape.getShapeId().substring(0, 10));
+                } else { // 락을 다른 사람이 갖고 있는 경우
+                    sendTrueOrFalse(false, cmEvent.getSender());
+                    System.out.println("LOCKLOCKLOCK222" + requestShape.getShapeId().substring(0, 10));
+                }
+            }
+            case "UNL" -> { // 도형 수정 언락
+                if (CMServerApp.lockMap.get(requestShape.getShapeId()).equals(cmEvent.getSender())) {
+                    CMServerApp.lockMap.remove(requestShape.getShapeId());
+                }
+            }
         }
+    }
+
+    private void sendTrueOrFalse(boolean isOk, String receiver) {
+        CMInteractionInfo interInfo = m_serverStub.getCMInfo().getInteractionInfo();
+        CMUser myself = interInfo.getMyself();
+        CMDummyEvent due = new CMDummyEvent();
+        due.setHandlerSession(myself.getCurrentSession());
+        due.setHandlerGroup(myself.getCurrentGroup());
+
+        if (isOk) {
+            due.setDummyInfo("TRU"); // 락을 잡았다.
+        } else {
+            due.setDummyInfo("FAL"); // 락 못 잡는다.
+        }
+        CMServerApp.m_serverStub.send(due, receiver);
     }
 
     private void processSessionEvent(CMEvent cmEvent) {

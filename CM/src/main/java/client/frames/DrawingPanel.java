@@ -27,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import client.global.ClientBroadcast;
+import client.global.ClientSend;
 import client.global.Main;
 import client.menus.PopupMenu;
 import client.shapes.GAnchor;
