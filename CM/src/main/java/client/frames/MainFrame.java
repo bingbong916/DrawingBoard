@@ -176,17 +176,17 @@ public class MainFrame extends JFrame {
       logArea.setCaretPosition(logArea.getDocument().getLength());
     });
   }
-  public static void setTabTitle(JPanel tab, String title) {
-    JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class,
-        tab);
-
-    for (int tabIndex = 0; tabIndex < tabbedPane.getTabCount(); tabIndex++) {
-      if (SwingUtilities.isDescendingFrom(tab, tabbedPane.getComponentAt(tabIndex))) {
-        tabbedPane.setTitleAt(tabIndex, title);
-        break;
-      }
-    }
-  }
+//  public static void setTabTitle(JPanel tab, String title) {
+//    JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class,
+//        tab);
+//
+//    for (int tabIndex = 0; tabIndex < tabbedPane.getTabCount(); tabIndex++) {
+//      if (SwingUtilities.isDescendingFrom(tab, tabbedPane.getComponentAt(tabIndex))) {
+//        tabbedPane.setTitleAt(tabIndex, title);
+//        break;
+//      }
+//    }
+//  }
 
   private class ExitHandler extends WindowAdapter {
 

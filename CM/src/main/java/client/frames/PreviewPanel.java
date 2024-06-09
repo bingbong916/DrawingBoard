@@ -13,10 +13,13 @@ public class PreviewPanel extends JPanel {
 
 	private Color lineColor;
 	private Color fillColor;
+	private int stroke;
+	private float[] dash;
 
 	public PreviewPanel() {
 		lineColor = Color.BLACK;
 		fillColor = Color.WHITE;
+		stroke = 1;
 		this.setBackground(Color.WHITE);
 		setLayout(new FlowLayout(FlowLayout.CENTER, 1, 1));
 
@@ -26,6 +29,14 @@ public class PreviewPanel extends JPanel {
 
 	public void setLineColor(Color linecolor) {
 		this.lineColor = linecolor;
+	}
+
+	public void setStroke(int index) {
+		this.stroke = index;
+	}
+
+	public void setDash(float[] dash) {
+		this.dash = dash;
 	}
 
 	public void setFillColor(Color fillcolor) {

@@ -81,7 +81,7 @@ public class FileMenu extends JMenu {
       this.filename = "File";
       this.checkfile = false;
       this.checkfilename = null;
-      MainFrame.setTabTitle(drawingPanel, filename);
+      //MainFrame.setTabTitle(drawingPanel, filename);
     }
   }
 
@@ -124,8 +124,8 @@ public class FileMenu extends JMenu {
         this.drawingPanel.initiatePanel();
         this.setCheckFile(file);
 
-        filename = fileChooser.getSelectedFile().getName();
-        MainFrame.setTabTitle(drawingPanel, filename);
+        //filename = fileChooser.getSelectedFile().getName();
+        //MainFrame.setTabTitle(drawingPanel, filename);
 
         load();
       }
@@ -199,8 +199,8 @@ public class FileMenu extends JMenu {
     if (returnVal == JFileChooser.APPROVE_OPTION) {
       this.file = fileChooser.getSelectedFile().toString();
 
-      filename = fileChooser.getSelectedFile().getName();
-      MainFrame.setTabTitle(drawingPanel, filename);
+      //filename = fileChooser.getSelectedFile().getName();
+      //MainFrame.setTabTitle(drawingPanel, filename);
 
       if (!this.file.endsWith(".gil")) {
         file += ".gil";
