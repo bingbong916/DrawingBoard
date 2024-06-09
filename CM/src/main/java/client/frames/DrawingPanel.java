@@ -308,6 +308,14 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
 //    repaint();
 //  }
 
+  public void clearAllShapes() {
+    this.shapes.clear();
+    this.selectedShape = null;
+    this.transformer = null;
+    this.isUpdated = false;
+    this.repaint();
+  }
+
   // Paint Components
   public void paint(Graphics g) {
     Graphics2D graphics2d = (Graphics2D) g;
@@ -349,16 +357,21 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
 
   private GShape transformInitGShape;
   private void initTransforming(int x1, int y1) {
-      if (this.selectedShape != null) {
-          transformInitGShape = this.selectedShape.cloneShapes();
-      } else {
-          transformInitGShape = null;
-      }
+    if (this.selectedShape != null) {
+      transformInitGShape = this.selectedShape.cloneShapes();
+    } else {
+      transformInitGShape = null;
+    }
 
     if (this.transformer instanceof GDrawer) {
       this.selectedShape = this.shapeTool.clone();
       transformInitGShape = this.selectedShape.cloneShapes();
       this.setColorInfo();
+      this.shapes.add(this.selectedShape);
+      UUID uuid = UUID.randomUUID();
+      String uniqueKey = uuid.toString();
+      this.selectedShape.setShapeId(uniqueKey);
+      ClientBroadcast.broadcastShape(this.selectedShape);
     }
 
     if (this.selectedShape instanceof GSelection) {
@@ -375,6 +388,9 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     g2.setXORMode(this.getBackground());
     try {
       this.transformer.keepTransforming(g2, x2, y2);
+      if (this.selectedShape != null) {
+        ClientBroadcast.broadcastUpdate(this.selectedShape);
+      }
     } catch (NullPointerException ignored) {
     }
   }
@@ -387,20 +403,24 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
         this.selectedShape = null;
         this.isUpdated = this.shapes.size() > 0;
       } else {
-        // 도형 추가
-        this.shapes.add(this.selectedShape);
+        if (!this.shapes.contains(this.selectedShape)) {
+          // 도형 추가
+          this.shapes.add(this.selectedShape);
 
-        this.clip.tempshapes.clear();
-        this.isUpdated = true;
-        
-        UUID uuid = UUID.randomUUID();
-        String uniqueKey = uuid.toString();
-        this.selectedShape.setShapeId(uniqueKey);
-        ClientBroadcast.broadcastShape(this.selectedShape);
+          this.clip.tempshapes.clear();
+          this.isUpdated = true;
+
+          UUID uuid = UUID.randomUUID();
+          String uniqueKey = uuid.toString();
+          this.selectedShape.setShapeId(uniqueKey);
+          ClientBroadcast.broadcastShape(this.selectedShape);
+        } else {
+          ClientBroadcast.broadcastUpdate(this.selectedShape);
+        }
       }
     } else if (this.transformInitGShape != null) {
       // 도형 이동
-        System.out.println("도형 이동!");
+      System.out.println("도형 이동!");
       ClientBroadcast.broadcastUpdate(this.selectedShape.cloneShapes());
     }
     this.repaint();

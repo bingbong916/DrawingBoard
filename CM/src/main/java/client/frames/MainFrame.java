@@ -82,7 +82,7 @@ public class MainFrame extends JFrame {
         attemptLogin();
       } else {
         cmClientApp.logoutProcess();
-        this.drawingPanel.setShapes(new Vector<GShape>());
+        this.drawingPanel.clearAllShapes();
         joinLeaveButton.setText("Join");
         disableComponents();
       }
