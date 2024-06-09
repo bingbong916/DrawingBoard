@@ -130,9 +130,10 @@ abstract public class GShape implements Serializable {
 		return selected;
 	}
 
-	public void setStroke(int index) {
+	public void setStroke1(int index) {
 		this.stroke = index;
 	}
+	public void setDash1(float[] dash) { this.dash = dash; }
 
 	public void setStrokeDash(float[] dash) {
 		this.dash = dash;
@@ -152,6 +153,10 @@ abstract public class GShape implements Serializable {
 
 	public void setFillColor(Color color) {
 		this.fillColor = color;
+	}
+
+	public void setStroke(int stroke) {
+		this.stroke = stroke;
 	}
 
 	public void setNullFillColor() {

@@ -18,10 +18,6 @@ import java.awt.image.ColorModel;
 import java.awt.image.MemoryImageSource;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -44,12 +40,6 @@ import client.transformer.GMover;
 import client.transformer.GResizer;
 import client.transformer.GRotator;
 import client.transformer.GTransformer;
-import kr.ac.konkuk.ccslab.cm.entity.CMUser;
-import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
-import kr.ac.konkuk.ccslab.cm.info.CMInteractionInfo;
-import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
-import server.CMClientApp;
-import server.Tools;
 
 public class DrawingPanel extends JPanel implements java.awt.print.Printable {
 
@@ -61,10 +51,11 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
   private Color fillColor;
   private Color backgroundColor;
   private Color objectbackgroundColor;
-
+  private int stroke;
   private Image openimage;
   private Image pixelimage;
   private int index;
+  private float[] dash;
   private double scale;
 
   private Vector<GShape> shapes;
@@ -93,6 +84,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     // attributes
     this.lineColor = Color.BLACK;
     this.fillColor = null;
+    this.stroke = 1;
     this.backgroundColor = null;
     this.objectbackgroundColor = null;
     this.isUpdated = false;
@@ -133,6 +125,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     this.objectbackgroundColor = null;
     this.lineColor = Color.BLACK;
     this.backgroundColor = Color.WHITE;
+    this.stroke = 1;
     this.selectedShape = null;
     this.openimage = null;
     this.pixelimage = null;
@@ -232,8 +225,16 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
         ClientBroadcast.broadcastUpdate(shape.cloneShapes());
       }
     }
+    this.stroke = index;
+    this.dash = dash;
+    previewPanel.setStroke(index);
+    previewPanel.setDash(dash);
     this.repaint();
   }
+
+  public int getStroke() { return this.stroke; }
+  public float[] getDash() { return this.dash; }
+
 
   public void setSelectedLineColor() {
     for (GShape shape : this.shapes) {
@@ -280,6 +281,8 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
   public void setColorInfo() {
     this.selectedShape.setFillColor(this.fillColor);
     this.selectedShape.setLineColor(this.lineColor);
+    this.selectedShape.setStroke1(stroke);
+    this.selectedShape.setDash1(dash);
   }
 
   public void setShapeFrontBack(boolean front) {
@@ -613,6 +616,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     shapes.removeAll(toDelete);
     toDelete.forEach(ClientBroadcast::broadcastDelete);
     this.selectedShape = null;
+    this.clearAllShapes();
     this.repaint();
   }
 

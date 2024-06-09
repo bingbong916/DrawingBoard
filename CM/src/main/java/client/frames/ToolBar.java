@@ -104,4 +104,12 @@ public class ToolBar extends JToolBar {
 		}
 	}
 
+	private class StrokeHandle implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			int index = drawingPanel.getStroke();
+			float[] dash = drawingPanel.getDash();
+			drawingPanel.setStroke(index, dash);
+		}
+	}
+
 }
