@@ -165,7 +165,12 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
 
   @SuppressWarnings("unchecked")
   public void setShapes(Object shapes) {
+    // 기존 코드
     this.shapes = (Vector<GShape>) shapes;
+    // load한 도형 broadcast
+    for (GShape shape : this.shapes) {
+      ClientBroadcast.broadcastShape(shape);
+    }
   }
 
   public void openImage(Image image) {

@@ -2,6 +2,7 @@ package client.menus;
 
 import client.frames.DrawingPanel;
 import client.frames.MainFrame;
+import client.global.ClientBroadcast;
 import client.global.Constants.EFileMenuItem;
 import java.awt.Color;
 import java.awt.Image;
@@ -25,6 +26,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import client.shapes.GShape;
 import client.tool.ImageCanvas;
 
 public class FileMenu extends JMenu {
@@ -120,6 +123,14 @@ public class FileMenu extends JMenu {
       int returnvalue = fileChooser.showOpenDialog(this.drawingPanel);
 
       if (returnvalue == JFileChooser.APPROVE_OPTION) {
+        // load 전에 있던 도형 싹다 delete
+        System.out.println(this.drawingPanel.getShapes().size() + "개개개개개개");
+        for (GShape shape : this.drawingPanel.getShapes()) {
+          System.out.println("삭제: " + shape);
+          ClientBroadcast.broadcastDelete(shape);
+        }
+
+        // 기존 코드
         file = fileChooser.getSelectedFile().toString();
         this.drawingPanel.initiatePanel();
         this.setCheckFile(file);
