@@ -12,7 +12,7 @@ public class ClientBroadcast {
         clonedGShape.setSelected(false);
         String shapeDetails = Tools.serializeShape(clonedGShape);
 
-        broadcacstMessage("ADD", shapeDetails);
+        broadcastMessage("ADD", shapeDetails);
     }
 
     public static void broadcastUpdate(GShape gShape) {
@@ -20,7 +20,7 @@ public class ClientBroadcast {
         clonedGShape.setSelected(false);
         String shapeDetails = Tools.serializeShape(clonedGShape);
 
-        broadcacstMessage("UPD", shapeDetails);
+        broadcastMessage("UPD", shapeDetails);
     }
 
     public static void broadcastDelete(GShape gShape) {
@@ -28,10 +28,21 @@ public class ClientBroadcast {
         clonedGShape.setSelected(false);
         String shapeDetails = Tools.serializeShape(clonedGShape);
 
-        broadcacstMessage("DEL", shapeDetails);
+        broadcastMessage("DEL", shapeDetails);
     }
-
-    private static void broadcacstMessage(String code, String message) {
+    public static void broadcastLock(GShape gShape) {
+        if (!Main.mainFrame.getDrawingPanel().isShapeLocked(gShape)) {
+            String shapeId = gShape.getShapeId();
+            broadcastMessage("LOC", shapeId);
+        }
+    }
+    public static void broadcastUnlock(GShape gShape) {
+        String shapeId = gShape.getShapeId();
+        if (!Main.mainFrame.getDrawingPanel().isShapeLocked(gShape)) {
+            broadcastMessage("UNL", shapeId);
+        }
+    }
+    private static void broadcastMessage(String code, String message) {
         CMInteractionInfo interInfo = Main.cmClientApp.getCmClientStub().getCMInfo().getInteractionInfo();
         CMUser myself = interInfo.getMyself();
 

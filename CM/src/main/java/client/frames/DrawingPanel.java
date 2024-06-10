@@ -19,11 +19,11 @@ import java.awt.image.MemoryImageSource;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.util.*;
+import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import client.global.ClientBroadcast;
-import client.global.ClientSend;
 import client.global.Main;
 import client.menus.PopupMenu;
 import client.shapes.GAnchor;
@@ -65,7 +65,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
   private GTransformer transformer;
 
   private final Vector<GShape> forFront;
-
+  private final Map<String, String> lockedShapes = new HashMap<>();
   private EDrawingState eDrawingState;
   private ECurrentState eCurrentState;
   private EAnchors eAnchor;
@@ -320,7 +320,37 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     this.repaint();
   }
 
-  // Paint Components
+  public void lockShape(String shapeId, String user) {
+    lockedShapes.put(shapeId, user);
+  }
+
+  public void unlockShape(String shapeId) {
+    lockedShapes.remove(shapeId);
+  }
+
+  public boolean isShapeLocked(GShape shape) {
+    String currentUser = Main.cmClientApp.getCmClientStub().getCMInfo().getInteractionInfo().getMyself().getName();
+    return lockedShapes.containsKey(shape.getShapeId()) && !lockedShapes.get(shape.getShapeId()).equals(currentUser);
+  }
+
+  public boolean isShapeLockedByAnotherUser(GShape shape) {
+    String currentUser = Main.cmClientApp.getCmClientStub().getCMInfo().getInteractionInfo().getMyself().getName();
+    return lockedShapes.containsKey(shape.getShapeId()) && !lockedShapes.get(shape.getShapeId()).equals(currentUser);
+  }
+
+  public void lockShapes(Vector<GShape> shapes, String user) {
+    for (GShape shape : shapes) {
+      lockShape(shape.getShapeId(), user);
+      ClientBroadcast.broadcastLock(shape);
+    }
+  }
+
+  public void unlockShapes(Vector<GShape> shapes) {
+    for (GShape shape : shapes) {
+      unlockShape(shape.getShapeId());
+      ClientBroadcast.broadcastUnlock(shape);
+    }
+  }
   public void paint(Graphics g) {
     Graphics2D graphics2d = (Graphics2D) g;
     super.paint(g);
@@ -368,16 +398,18 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     }
 
     if (this.transformer instanceof GDrawer) {
+      this.clearSelected();
       this.selectedShape = this.shapeTool.clone();
       transformInitGShape = this.selectedShape.cloneShapes();
       this.setColorInfo();
-      this.shapes.add(this.selectedShape);
-      UUID uuid = UUID.randomUUID();
-      String uniqueKey = uuid.toString();
-      this.selectedShape.setShapeId(uniqueKey);
-      ClientBroadcast.broadcastShape(this.selectedShape);
+      if (!(this.selectedShape instanceof GSelection)) {
+        this.shapes.add(this.selectedShape);
+        UUID uuid = UUID.randomUUID();
+        String uniqueKey = uuid.toString();
+        this.selectedShape.setShapeId(uniqueKey);
+        ClientBroadcast.broadcastShape(this.selectedShape);
+      }
     }
-
     if (this.selectedShape instanceof GSelection) {
       this.selectedShape.setFillColor(Color.LIGHT_GRAY);
       this.selectedShape.setLineColor(Color.BLACK);
@@ -391,43 +423,53 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     Graphics2D g2 = (Graphics2D) this.getGraphics();
     g2.setXORMode(this.getBackground());
     try {
-      this.transformer.keepTransforming(g2, x2, y2);
-      if (this.selectedShape != null) {
-        ClientBroadcast.broadcastUpdate(this.selectedShape);
+      if (!isShapeLocked(this.selectedShape)) {
+        this.transformer.keepTransforming(g2, x2, y2);
+        if (this.selectedShape != null) {
+          ClientBroadcast.broadcastUpdate(this.selectedShape);
+        }
       }
     } catch (NullPointerException ignored) {
     }
   }
 
   private void finishTransforming(int x2, int y2) {
-    this.transformer.finishTransforming((Graphics2D) this.getGraphics(), x2, y2);
-    if (this.transformer instanceof GDrawer) {
-      if (this.selectedShape instanceof GSelection) {
-        ((GSelection) this.selectedShape).contains(this.shapes);
-        this.selectedShape = null;
-        this.isUpdated = this.shapes.size() > 0;
-      } else {
-        if (!this.shapes.contains(this.selectedShape)) {
-          // 도형 추가
-          this.shapes.add(this.selectedShape);
-
-          this.clip.tempshapes.clear();
-          this.isUpdated = true;
-
-          UUID uuid = UUID.randomUUID();
-          String uniqueKey = uuid.toString();
-          this.selectedShape.setShapeId(uniqueKey);
-          ClientBroadcast.broadcastShape(this.selectedShape);
+    if (this.selectedShape != null && !isShapeLocked(this.selectedShape)) {
+      this.transformer.finishTransforming((Graphics2D) this.getGraphics(), x2, y2);
+      if (this.transformer instanceof GDrawer) {
+        if (this.selectedShape instanceof GSelection) {
+          ((GSelection) this.selectedShape).contains(this.shapes);
+          Vector<GShape> containedShapes = ((GSelection) this.selectedShape).getContainedShapes();
+          containedShapes.removeIf(this::isShapeLockedByAnotherUser);
+          String user = Main.cmClientApp.getCmClientStub().getCMInfo().getInteractionInfo().getMyself().getName();
+          lockShapes(containedShapes, user);
+          this.selectedShape = null;
+          this.isUpdated = this.shapes.size() > 0;
         } else {
-          ClientBroadcast.broadcastUpdate(this.selectedShape);
+          if (!this.shapes.contains(this.selectedShape)) {
+            // 도형 추가
+            this.shapes.add(this.selectedShape);
+
+            this.clip.tempshapes.clear();
+            this.isUpdated = true;
+
+            UUID uuid = UUID.randomUUID();
+            String uniqueKey = uuid.toString();
+            this.selectedShape.setShapeId(uniqueKey);
+            ClientBroadcast.broadcastShape(this.selectedShape);
+          } else {
+            ClientBroadcast.broadcastUpdate(this.selectedShape);
+          }
         }
+      } else if (this.transformInitGShape != null) {
+        // 도형 이동
+        System.out.println("도형 이동!");
+        ClientBroadcast.broadcastUpdate(this.selectedShape.cloneShapes());
       }
-    } else if (this.transformInitGShape != null) {
-      // 도형 이동
-      System.out.println("도형 이동!");
-      ClientBroadcast.broadcastUpdate(this.selectedShape.cloneShapes());
+      this.repaint();
+    } else {
+      System.err.println("선택된 도형이 없거나, 다른 유저가 사용 중");
     }
-    this.repaint();
   }
 
   private void continueTransforming(int x2, int y2) {
@@ -443,35 +485,49 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
       this.clearSelected();
       this.transformer = new GDrawer();
     } else if (geteCurrentState() == ECurrentState.eSelecting) {
-      if (!this.selectedShape.isSelected()) {
-        this.clearSelected();
-        this.selectedShape.setSelected(true);
-      }
-      switch (eOnState) {
-        case eOnShape:
-          this.transformer = new GMover();
-          break;
-        case eOnResize:
-          this.transformer = new GResizer();
-          break;
-        case eOnRotate:
-          this.transformer = new GRotator();
-          break;
-        default:
-          this.eDrawingState = null;
-          break;
+      if (!isShapeLockedByAnotherUser(this.selectedShape)) {
+        if (!this.selectedShape.isSelected()) {
+//          this.clearSelected();
+          this.selectedShape.setSelected(true);
+          String user = Main.cmClientApp.getCmClientStub().getCMInfo().getInteractionInfo().getMyself().getName();
+          lockShape(this.selectedShape.getShapeId(), user);
+          ClientBroadcast.broadcastLock(this.selectedShape);
+        }
+        switch (eOnState) {
+          case eOnShape:
+            this.transformer = new GMover();
+            break;
+          case eOnResize:
+            this.transformer = new GResizer();
+            break;
+          case eOnRotate:
+            this.transformer = new GRotator();
+            break;
+          default:
+            this.eDrawingState = null;
+            break;
+        }
+      } else {
+        clearSelected();
       }
     }
   }
 
   private void clearSelected() {
+    Vector<GShape> shapesToUnlock = new Vector<>();
     for (GShape shape : this.shapes) {
-      shape.setSelected(false);
+      if (shape.isSelected()) {
+        shapesToUnlock.add(shape);
+        shape.setSelected(false);
+      }
     }
+    unlockShapes(shapesToUnlock);
+    this.selectedShape = null;
   }
 
   public EOnState onShape(int x, int y) {
     for (GShape shape : this.shapes) {
+      if (isShapeLockedByAnotherUser(shape)) continue;
       EOnState eOnState = shape.onShape(x, y);
       if (geteCurrentState() == ECurrentState.eDrawing) {
         eOnState = null;
@@ -626,9 +682,12 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     @Override
     public void mousePressed(MouseEvent e) {
       if (e.getButton() == MouseEvent.BUTTON1) {
+        if (onShape(e.getX(), e.getY()) == null) {
+          clearSelected();
+        }
         defineActionState(e.getX(), e.getY());
         if (eDrawingState == EDrawingState.eIdle) {
-          if (shapeTool.geteDrawingStyle() == EDrawingStyle.e2PointDrawing) {
+          if (shapeTool != null && shapeTool.geteDrawingStyle() == EDrawingStyle.e2PointDrawing) {
             initTransforming(e.getX(), e.getY());
             eDrawingState = EDrawingState.eTransforming;
           }
@@ -639,7 +698,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     @Override
     public void mouseDragged(MouseEvent e) {
       if (eDrawingState == EDrawingState.eTransforming) {
-        if (shapeTool.geteDrawingStyle() == EDrawingStyle.e2PointDrawing) {
+        if (shapeTool != null && shapeTool.geteDrawingStyle() == EDrawingStyle.e2PointDrawing) {
           keepTransforming(e.getX(), e.getY());
         }
       }
@@ -648,7 +707,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     @Override
     public void mouseReleased(MouseEvent e) {
       if (eDrawingState == EDrawingState.eTransforming) {
-        if (shapeTool.geteDrawingStyle() == EDrawingStyle.e2PointDrawing) {
+        if (shapeTool != null && shapeTool.geteDrawingStyle() == EDrawingStyle.e2PointDrawing) {
           finishTransforming(e.getX(), e.getY());
           eDrawingState = EDrawingState.eIdle;
         }
@@ -658,6 +717,9 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     @Override
     public void mouseClicked(MouseEvent e) {
       if (e.getButton() == MouseEvent.BUTTON1) {// left click
+        if (onShape(e.getX(), e.getY()) == null) {
+          clearSelected();
+        }
         if (e.getClickCount() == 1) {
           mouse1Cliked(e);
         } else if (e.getClickCount() == 2) {
@@ -671,7 +733,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
 
     private void mouse1Cliked(MouseEvent e) {
       if (e.getButton() == MouseEvent.BUTTON1) {
-        if (shapeTool.geteDrawingStyle() == EDrawingStyle.eNPointDrawing) {
+        if (shapeTool != null && shapeTool.geteDrawingStyle() == EDrawingStyle.eNPointDrawing) {
           if (eDrawingState == EDrawingState.eIdle) {
             initTransforming(e.getX(), e.getY());
             eDrawingState = EDrawingState.eTransforming;
@@ -689,7 +751,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
           ((GTextBox) selectedShape).setText(text);
         }
       }
-      if (shapeTool.geteDrawingStyle() == EDrawingStyle.eNPointDrawing
+      if (shapeTool != null && shapeTool.geteDrawingStyle() == EDrawingStyle.eNPointDrawing
               && eDrawingState == EDrawingState.eTransforming) {
         finishTransforming(e.getX(), e.getY());
         eDrawingState = EDrawingState.eIdle;
