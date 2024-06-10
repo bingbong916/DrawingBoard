@@ -137,13 +137,19 @@ public class CMClientEventHandler implements CMAppEventHandler {
                         gShapes.removeIf(g -> g.equals(requestShape));
                         System.out.println("◎● Log: 도형 삭제됨");
                     }
+                    case "LOC" -> {
+                        System.out.println("◎● Log: 도형 잠금됨 - " + content + " by " + user);
+                        drawingPanel.lockShape(content, user);
+                    }
+                    case "UNL" -> {
+                        System.out.println("◎● Log: 도형 잠금 해제됨 - " + content + " by " + user);
+                        drawingPanel.unlockShape(content);
+                    }
                     case "TRU" -> {
-                        // 서버로부터 락을 얻음
-                        System.out.println("TrueTrueTrueTrueTrueTrueTrue");
+                        System.out.println("◎● Log: Lock을 얻음");
                     }
                     case "FAL" -> {
-                        // 락을 못얻음
-                        System.out.println("FalseFalseFalseFalseFalseFalse");
+                        System.out.println("◎● Log: Lock을 얻지 못함");
                     }
                 }
                 mainFrame.getDrawingPanel().repaint();

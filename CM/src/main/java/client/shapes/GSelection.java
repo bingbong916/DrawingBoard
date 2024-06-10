@@ -1,5 +1,7 @@
 package client.shapes;
 
+import client.frames.DrawingPanel;
+import client.global.Main;
 import java.util.Vector;
 
 public class GSelection extends GRectangle {
@@ -16,11 +18,17 @@ public class GSelection extends GRectangle {
 	}
 	
 	public void contains(Vector<GShape> shapes) {
+		DrawingPanel drawingPanel = Main.mainFrame.getDrawingPanel();
+		this.containedShapes.clear();
 		for(GShape shape : shapes) {
-			if(this.getShape().contains(shape.getShape().getBounds())) {
+			if(this.getShape().contains(shape.getShape().getBounds()) && !drawingPanel.isShapeLockedByAnotherUser(shape)) {
 				this.containedShapes.add(shape);
 				shape.setSelected(true);
 			}
 		}
+	}
+
+	public Vector<GShape> getContainedShapes() {
+		return containedShapes;
 	}
 }

@@ -63,19 +63,19 @@ public class CMServerEventHandler implements CMAppEventHandler {
             }
             case "LOC" -> { // 도형 수정 락
                 // 락이 기존에 없거나 본인 경우
-                String lockValue = CMServerApp.lockMap.getOrDefault(requestShape.getShapeId(), null);
+                String lockValue = CMServerApp.lockMap.getOrDefault(content, null);
                 if (lockValue == null || lockValue.equals(cmEvent.getSender())) {
                     sendTrueOrFalse(true, cmEvent.getSender());
-                    CMServerApp.lockMap.put(requestShape.getShapeId(), cmEvent.getSender());
-                    System.out.println("LOCKLOCKLOCK111" + requestShape.getShapeId().substring(0, 10));
+                    CMServerApp.lockMap.put(content, cmEvent.getSender());
+                    System.out.println("LOCKLOCKLOCK111" + content.substring(0, 10));
                 } else { // 락을 다른 사람이 갖고 있는 경우
                     sendTrueOrFalse(false, cmEvent.getSender());
-                    System.out.println("LOCKLOCKLOCK222" + requestShape.getShapeId().substring(0, 10));
+                    System.out.println("LOCKLOCKLOCK222" + content.substring(0, 10));
                 }
             }
-            case "UNL" -> { // 도형 수정 언락
-                if (CMServerApp.lockMap.get(requestShape.getShapeId()).equals(cmEvent.getSender())) {
-                    CMServerApp.lockMap.remove(requestShape.getShapeId());
+            case "UNL" -> {
+                if (CMServerApp.lockMap.get(content).equals(cmEvent.getSender())) {
+                    CMServerApp.lockMap.remove(content);
                 }
             }
         }
