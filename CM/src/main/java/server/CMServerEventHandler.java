@@ -40,60 +40,60 @@ public class CMServerEventHandler implements CMAppEventHandler {
             System.out.println("서버로 들어오는 요청 잘못됨.");
             return;
         }
+        // 도형 ID를 가져와 잠금 상태를 확인
+        String shapeId = requestShape.getShapeId();
+        String lockOwner = CMServerApp.lockMap.get(shapeId);
+
         switch (type) {
             case "ADD" -> {
-                CMServerApp.shapeList.add(requestShape);
-                System.out.println("추가됨");
-                System.out.println(CMServerApp.shapeList);
+                if (lockOwner == null) {
+                    CMServerApp.shapeList.add(requestShape);
+                    System.out.println("추가됨");
+                    System.out.println(CMServerApp.shapeList);
+                } else {
+                    System.out.println("추가 실패: 도형이 잠금 상태임");
+                }
             }
             case "UPD" -> {
-                for (int i = 0; i < CMServerApp.shapeList.size(); i++) {
-                    if (CMServerApp.shapeList.get(i).equals(requestShape)) {
-                        CMServerApp.shapeList.set(i, requestShape);
-                        System.out.println("업뎃됨");
-                        System.out.println(CMServerApp.shapeList);
-                        break;
+                if (lockOwner == null || lockOwner.equals(cmEvent.getSender())) {
+                    for (int i = 0; i < CMServerApp.shapeList.size(); i++) {
+                        if (CMServerApp.shapeList.get(i).equals(requestShape)) {
+                            CMServerApp.shapeList.set(i, requestShape);
+                            System.out.println("업뎃됨");
+                            System.out.println(CMServerApp.shapeList);
+                            break;
+                        }
                     }
+                } else {
+                    System.out.println("업데이트 실패: 도형이 잠금 상태임");
                 }
             }
             case "DEL" -> {
-                CMServerApp.shapeList.removeIf(gShape -> gShape.equals(requestShape));
-                System.out.println("삭제됨");
-                System.out.println(CMServerApp.shapeList);
+                if (lockOwner == null || lockOwner.equals(cmEvent.getSender())) {
+                    CMServerApp.shapeList.removeIf(gShape -> gShape.equals(requestShape));
+                    System.out.println("삭제됨");
+                    System.out.println(CMServerApp.shapeList);
+                } else {
+                    System.out.println("삭제 실패: 도형이 잠금 상태임");
+                }
             }
-            case "LOC" -> { // 도형 수정 락
-                // 락이 기존에 없거나 본인 경우
-                String lockValue = CMServerApp.lockMap.getOrDefault(content, null);
-                if (lockValue == null || lockValue.equals(cmEvent.getSender())) {
-                    sendTrueOrFalse(true, cmEvent.getSender());
-                    CMServerApp.lockMap.put(content, cmEvent.getSender());
-                    System.out.println("LOCKLOCKLOCK111" + content.substring(0, 10));
-                } else { // 락을 다른 사람이 갖고 있는 경우
-                    sendTrueOrFalse(false, cmEvent.getSender());
-                    System.out.println("LOCKLOCKLOCK222" + content.substring(0, 10));
+            case "LOC" -> {
+                if (lockOwner == null || lockOwner.equals(cmEvent.getSender())) {
+                    CMServerApp.lockMap.put(shapeId, cmEvent.getSender());
+                    broadcastLockMapToAllClients();
+                } else {
+                    System.out.println("락 실패: 도형이 이미 락됨");
                 }
             }
             case "UNL" -> {
-                if (CMServerApp.lockMap.get(content).equals(cmEvent.getSender())) {
-                    CMServerApp.lockMap.remove(content);
+                if (lockOwner != null && lockOwner.equals(cmEvent.getSender())) {
+                    CMServerApp.lockMap.remove(shapeId);
+                    broadcastLockMapToAllClients();
+                } else {
+                    System.out.println("언락 실패: 도형의 주인이 아님");
                 }
             }
         }
-    }
-
-    private void sendTrueOrFalse(boolean isOk, String receiver) {
-        CMInteractionInfo interInfo = m_serverStub.getCMInfo().getInteractionInfo();
-        CMUser myself = interInfo.getMyself();
-        CMDummyEvent due = new CMDummyEvent();
-        due.setHandlerSession(myself.getCurrentSession());
-        due.setHandlerGroup(myself.getCurrentGroup());
-
-        if (isOk) {
-            due.setDummyInfo("TRU"); // 락을 잡았다.
-        } else {
-            due.setDummyInfo("FAL"); // 락 못 잡는다.
-        }
-        CMServerApp.m_serverStub.send(due, receiver);
     }
 
     private void processSessionEvent(CMEvent cmEvent) {
@@ -104,6 +104,21 @@ public class CMServerEventHandler implements CMAppEventHandler {
 
                 sendShapesList(se.getUserName());
             }
+        }
+    }
+    private void broadcastLockMapToAllClients() {
+        Gson gson = new Gson();
+        String lockMapJson = gson.toJson(CMServerApp.lockMap);
+
+        CMInteractionInfo interInfo = m_serverStub.getCMInfo().getInteractionInfo();
+        CMUser myself = interInfo.getMyself();
+        CMDummyEvent due = new CMDummyEvent();
+        due.setHandlerSession(myself.getCurrentSession());
+        due.setHandlerGroup(myself.getCurrentGroup());
+
+        for (CMUser user : interInfo.getLoginUsers().getAllMembers()) {
+            due.setDummyInfo("LMP" + lockMapJson);
+            m_serverStub.send(due, user.getName());
         }
     }
 

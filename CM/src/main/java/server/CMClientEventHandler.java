@@ -139,17 +139,16 @@ public class CMClientEventHandler implements CMAppEventHandler {
                     }
                     case "LOC" -> {
                         System.out.println("◎● Log: 도형 잠금됨 - " + content + " by " + user);
-                        drawingPanel.lockShape(content, user);
                     }
                     case "UNL" -> {
                         System.out.println("◎● Log: 도형 잠금 해제됨 - " + content + " by " + user);
-                        drawingPanel.unlockShape(content);
                     }
-                    case "TRU" -> {
-                        System.out.println("◎● Log: Lock을 얻음");
-                    }
-                    case "FAL" -> {
-                        System.out.println("◎● Log: Lock을 얻지 못함");
+                    case "LMP" -> {
+                        Gson gson = new Gson();
+                        Type typeOfHashMap = new TypeToken<Map<String, String>>() {}.getType();
+                        Map<String, String> lockMap = gson.fromJson(content, typeOfHashMap);
+                        drawingPanel.updateLockMap(lockMap);
+                        System.out.println("◎● Log: 잠금 상태 업데이트됨");
                     }
                 }
                 mainFrame.getDrawingPanel().repaint();
