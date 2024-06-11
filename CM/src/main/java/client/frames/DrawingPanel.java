@@ -19,7 +19,6 @@ import java.awt.image.MemoryImageSource;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.util.*;
-import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -198,6 +197,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
       this.eCurrentState = ECurrentState.eSelecting;
     }
   }
+
   public void addMouseHandling() {
     MouseHandler mouseHandler = new MouseHandler();
     this.addMouseListener(mouseHandler);
@@ -212,6 +212,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
       this.removeMouseMotionListener(listener);
     }
   }
+
   public void setSelection(GShape shapeTool) {
     this.shapeTool = shapeTool;
   }
@@ -221,7 +222,6 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
       if (shape.isSelected()) {
         shape.setStroke(index);
         shape.setStrokeDash(dash);
-        //
         ClientBroadcast.broadcastUpdate(shape.cloneShapes());
       }
     }
@@ -232,15 +232,18 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     this.repaint();
   }
 
-  public int getStroke() { return this.stroke; }
-  public float[] getDash() { return this.dash; }
+  public int getStroke() {
+    return this.stroke;
+  }
 
+  public float[] getDash() {
+    return this.dash;
+  }
 
   public void setSelectedLineColor() {
     for (GShape shape : this.shapes) {
       if (shape.isSelected()) {
         shape.setLineColor(lineColor);
-        //
         ClientBroadcast.broadcastUpdate(shape.cloneShapes());
       }
     }
@@ -251,7 +254,6 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     for (GShape shape : this.shapes) {
       if (shape.isSelected()) {
         shape.setFillColor(fillColor);
-        //
         ClientBroadcast.broadcastUpdate(shape.cloneShapes());
       }
     }
@@ -302,16 +304,6 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     this.repaint();
   }
 
-//  public void zoomIn() {
-//    this.scale = this.scale+0.5;
-//    repaint();
-//  }
-//
-//  public void zoomOut() {
-//    this.scale = this.scale-0.5;
-//    repaint();
-//  }
-
   public void clearAllShapes() {
     this.shapes.clear();
     this.selectedShape = null;
@@ -320,17 +312,35 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     this.repaint();
   }
 
-  public void lockShape(String shapeId, String user) {
-    lockedShapes.put(shapeId, user);
+  // 서버로부터 lockMap을 업데이트하는 메서드
+  public void updateLockMap(Map<String, String> newLockMap) {
+    lockedShapes.clear();
+    lockedShapes.putAll(newLockMap);
   }
 
+  // 도형 잠금 요청 메서드
+  public void lockShape(String shapeId) {
+    GShape shape = findShapeById(shapeId);
+    if (shape != null) {
+      ClientBroadcast.broadcastLock(shape);
+    }
+  }
+
+  // 도형 잠금 해제 요청 메서드
   public void unlockShape(String shapeId) {
-    lockedShapes.remove(shapeId);
+    GShape shape = findShapeById(shapeId);
+    if (shape != null) {
+      ClientBroadcast.broadcastUnlock(shape);
+    }
   }
 
-  public boolean isShapeLocked(GShape shape) {
-    String currentUser = Main.cmClientApp.getCmClientStub().getCMInfo().getInteractionInfo().getMyself().getName();
-    return lockedShapes.containsKey(shape.getShapeId()) && !lockedShapes.get(shape.getShapeId()).equals(currentUser);
+  public GShape findShapeById(String shapeId) {
+    for (GShape shape : shapes) {
+      if (shape.getShapeId().equals(shapeId)) {
+        return shape;
+      }
+    }
+    return null;
   }
 
   public boolean isShapeLockedByAnotherUser(GShape shape) {
@@ -338,19 +348,18 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     return lockedShapes.containsKey(shape.getShapeId()) && !lockedShapes.get(shape.getShapeId()).equals(currentUser);
   }
 
-  public void lockShapes(Vector<GShape> shapes, String user) {
+  public void lockShapes(Vector<GShape> shapes) {
     for (GShape shape : shapes) {
-      lockShape(shape.getShapeId(), user);
-      ClientBroadcast.broadcastLock(shape);
+      lockShape(shape.getShapeId());
     }
   }
 
   public void unlockShapes(Vector<GShape> shapes) {
     for (GShape shape : shapes) {
       unlockShape(shape.getShapeId());
-      ClientBroadcast.broadcastUnlock(shape);
     }
   }
+
   public void paint(Graphics g) {
     Graphics2D graphics2d = (Graphics2D) g;
     super.paint(g);
@@ -390,11 +399,15 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
   }
 
   private GShape transformInitGShape;
+
   private void initTransforming(int x1, int y1) {
     if (this.selectedShape != null) {
       transformInitGShape = this.selectedShape.cloneShapes();
     } else {
       transformInitGShape = null;
+    }
+    if (this.transformer == null) {
+      return; // transformer 가 null 인 경우 처리
     }
 
     if (this.transformer instanceof GDrawer) {
@@ -423,7 +436,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     Graphics2D g2 = (Graphics2D) this.getGraphics();
     g2.setXORMode(this.getBackground());
     try {
-      if (!isShapeLocked(this.selectedShape)) {
+      if (!isShapeLockedByAnotherUser(this.selectedShape)) {
         this.transformer.keepTransforming(g2, x2, y2);
         if (this.selectedShape != null) {
           ClientBroadcast.broadcastUpdate(this.selectedShape);
@@ -434,22 +447,19 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
   }
 
   private void finishTransforming(int x2, int y2) {
-    if (this.selectedShape != null && !isShapeLocked(this.selectedShape)) {
+    if (this.selectedShape != null && !isShapeLockedByAnotherUser(this.selectedShape)) {
       this.transformer.finishTransforming((Graphics2D) this.getGraphics(), x2, y2);
       if (this.transformer instanceof GDrawer) {
         if (this.selectedShape instanceof GSelection) {
           ((GSelection) this.selectedShape).contains(this.shapes);
           Vector<GShape> containedShapes = ((GSelection) this.selectedShape).getContainedShapes();
           containedShapes.removeIf(this::isShapeLockedByAnotherUser);
-          String user = Main.cmClientApp.getCmClientStub().getCMInfo().getInteractionInfo().getMyself().getName();
-          lockShapes(containedShapes, user);
+          lockShapes(containedShapes);
           this.selectedShape = null;
           this.isUpdated = this.shapes.size() > 0;
         } else {
           if (!this.shapes.contains(this.selectedShape)) {
-            // 도형 추가
             this.shapes.add(this.selectedShape);
-
             this.clip.tempshapes.clear();
             this.isUpdated = true;
 
@@ -462,8 +472,6 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
           }
         }
       } else if (this.transformInitGShape != null) {
-        // 도형 이동
-        System.out.println("도형 이동!");
         ClientBroadcast.broadcastUpdate(this.selectedShape.cloneShapes());
       }
       this.repaint();
@@ -482,16 +490,19 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
   private void defineActionState(int x, int y) {
     EOnState eOnState = onShape(x, y);
     if (eOnState == null) {
-      this.clearSelected();
-      this.transformer = new GDrawer();
+      this.clearSelected(); // 도형 외 다른 부분을 누름
+      this.transformer = new GDrawer(); // 그림 그리기 모드
     } else if (geteCurrentState() == ECurrentState.eSelecting) {
-      if (!isShapeLockedByAnotherUser(this.selectedShape)) {
+      GShape shapeUnderCursor = getShapeAt(x, y); // 위치에서 도형 검색
+      if (shapeUnderCursor != null && !isShapeLockedByAnotherUser(shapeUnderCursor)) {
+        this.selectedShape = shapeUnderCursor;
+        if (this.selectedShape != null && this.selectedShape != shapeUnderCursor) {
+          this.clearSelected(); // 다른 도형을 선택했을 때 현재 선택된 도형 해제
+        }
+        this.selectedShape = shapeUnderCursor;
         if (!this.selectedShape.isSelected()) {
-//          this.clearSelected();
           this.selectedShape.setSelected(true);
-          String user = Main.cmClientApp.getCmClientStub().getCMInfo().getInteractionInfo().getMyself().getName();
-          lockShape(this.selectedShape.getShapeId(), user);
-          ClientBroadcast.broadcastLock(this.selectedShape);
+          lockShape(this.selectedShape.getShapeId()); // 내가 누른 도형 lock
         }
         switch (eOnState) {
           case eOnShape:
@@ -508,33 +519,44 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
             break;
         }
       } else {
-        clearSelected();
+        clearSelected(); // 다른 사람이 선택한 도형을 클릭 -> clearSelected
       }
     }
+  }
+  private GShape getShapeAt(int x, int y) {
+    for (GShape shape : this.shapes) {
+      if (shape.onShape(x, y) != null) {
+        return shape;
+      }
+    }
+    return null;
   }
 
   private void clearSelected() {
     Vector<GShape> shapesToUnlock = new Vector<>();
+    // 현재 선택된 도형을 shapesToUnlock 벡터에 추가
+    if (this.selectedShape != null) {
+      shapesToUnlock.add(this.selectedShape);
+    }
+    // 선택된 도형을 shapesToUnlock 벡터에 추가, 선택 해제
     for (GShape shape : this.shapes) {
       if (shape.isSelected()) {
         shapesToUnlock.add(shape);
         shape.setSelected(false);
       }
     }
+    // unlockShapes 메서드 호출, 도형 잠금을 해제
     unlockShapes(shapesToUnlock);
+    // 선택된 도형을 null 로 설정
     this.selectedShape = null;
+    this.repaint();
   }
 
   public EOnState onShape(int x, int y) {
     for (GShape shape : this.shapes) {
       if (isShapeLockedByAnotherUser(shape)) continue;
       EOnState eOnState = shape.onShape(x, y);
-      if (geteCurrentState() == ECurrentState.eDrawing) {
-        eOnState = null;
-        return eOnState;
-      }
       if (eOnState != null) {
-        this.selectedShape = shape;
         return eOnState;
       }
     }
@@ -598,7 +620,6 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
               : (this.eAnchor != null && selectedShape.isSelected()) ? getResizeCursor(eAnchor)
               : CursorManager.DEFAULT_CURSOR);
     }
-
   }
 
   public void undo() {
@@ -682,16 +703,15 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     @Override
     public void mousePressed(MouseEvent e) {
       if (e.getButton() == MouseEvent.BUTTON1) {
-        if (onShape(e.getX(), e.getY()) == null) {
-          clearSelected();
-        }
-        defineActionState(e.getX(), e.getY());
+        defineActionState(e.getX(), e.getY()); // 도형과 상태를 확인하고 설정
         if (eDrawingState == EDrawingState.eIdle) {
           if (shapeTool != null && shapeTool.geteDrawingStyle() == EDrawingStyle.e2PointDrawing) {
             initTransforming(e.getX(), e.getY());
             eDrawingState = EDrawingState.eTransforming;
           }
         }
+      } else {
+        clearSelected();
       }
     }
 
@@ -726,6 +746,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
           mouse2Cliked(e);
         }
       } else if (e.getButton() == MouseEvent.BUTTON3) {// right click
+        clearSelected();
         PopupMenu popup = new PopupMenu(DrawingPanel.this);
         popup.show(DrawingPanel.this, e.getX(), e.getY());
       }

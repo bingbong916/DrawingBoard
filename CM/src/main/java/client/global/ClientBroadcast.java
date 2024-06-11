@@ -1,3 +1,4 @@
+// ClientBroadcast.java
 package client.global;
 
 import client.shapes.GShape;
@@ -5,6 +6,8 @@ import kr.ac.konkuk.ccslab.cm.entity.CMUser;
 import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
 import kr.ac.konkuk.ccslab.cm.info.CMInteractionInfo;
 import server.Tools;
+
+import java.util.Map;
 
 public class ClientBroadcast {
     public static void broadcastShape(GShape gShape) {
@@ -30,18 +33,19 @@ public class ClientBroadcast {
 
         broadcastMessage("DEL", shapeDetails);
     }
+
     public static void broadcastLock(GShape gShape) {
-        if (!Main.mainFrame.getDrawingPanel().isShapeLocked(gShape)) {
-            String shapeId = gShape.getShapeId();
-            broadcastMessage("LOC", shapeId);
+        if (!Main.mainFrame.getDrawingPanel().isShapeLockedByAnotherUser(gShape)) {
+            String shapeDetails = Tools.serializeShape(gShape.cloneShapes());
+            broadcastMessage("LOC", shapeDetails);
         }
     }
+
     public static void broadcastUnlock(GShape gShape) {
-        String shapeId = gShape.getShapeId();
-        if (!Main.mainFrame.getDrawingPanel().isShapeLocked(gShape)) {
-            broadcastMessage("UNL", shapeId);
-        }
+        String shapeDetails = Tools.serializeShape(gShape.cloneShapes());
+        broadcastMessage("UNL", shapeDetails);
     }
+
     private static void broadcastMessage(String code, String message) {
         CMInteractionInfo interInfo = Main.cmClientApp.getCmClientStub().getCMInfo().getInteractionInfo();
         CMUser myself = interInfo.getMyself();
