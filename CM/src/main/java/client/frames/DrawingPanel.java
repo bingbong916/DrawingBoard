@@ -537,7 +537,7 @@ public class DrawingPanel extends JPanel implements java.awt.print.Printable {
     return null;
   }
 
-  private void clearSelected() {
+  public void clearSelected() {
     Vector<GShape> shapesToUnlock = new Vector<>();
     // 현재 선택된 도형을 shapesToUnlock 벡터에 추가
     if (this.selectedShape != null) {

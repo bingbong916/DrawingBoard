@@ -125,6 +125,7 @@ public class CMServerEventHandler implements CMAppEventHandler {
     public void sendShapesList(String receiver) {
         // 로그인 한 유저에게 저장된 도형 목록 전송
         CMInteractionInfo interInfo = m_serverStub.getCMInfo().getInteractionInfo();
+        broadcastLockMapToAllClients();
         CMUser myself = interInfo.getMyself();
         CMDummyEvent due = new CMDummyEvent();
         due.setHandlerSession(myself.getCurrentSession());
