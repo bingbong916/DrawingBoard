@@ -81,6 +81,7 @@ public class MainFrame extends JFrame {
       if (joinLeaveButton.getText().equals("Join")) {
         attemptLogin();
       } else {
+        this.drawingPanel.clearSelected();
         cmClientApp.logoutProcess();
         this.drawingPanel.clearAllShapes();
         joinLeaveButton.setText("Join");
